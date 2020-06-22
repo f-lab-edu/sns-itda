@@ -12,23 +12,43 @@
     <artifactId>sns-server</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>sns-server</name>
-    <description>Demo project for Spring Boot</description>
+    <description>SNS project for Spring Boot</description>
 
     <properties>
         <java.version>14</java.version>
     </properties>
 
     <dependencies>
+        <!--
+        spring-boot-starter-web
+        : Spring MVC를 사용하는 RESTful 애플리케이션을 포함한 웹 구축을 위한 스타터
+          Tomcat을 기본 내장 컨테이너로 사용
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!--
+        lombok
+        : Model 클래스를 만들 때, getter, setter, toString 등 메서드 작성 코드를 줄여주는 JAVA 라이브러리
+         여러가지 어노테이션을 기반으로 코드를 컴파일 과정에서 생성해 주는 방식으로 동작
+        -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+
+        <!--
+        spring-boot-starter-test
+        : Spring Boot 애플리케이션을 테스트하기 위한 스타터
+          JUnit, Hamcrest, Mockito를 포함
+
+        junit-vintage-engine
+        : JUnit Vintage의 TestEngine 구현체
+         JUnit3, JUnit4 기반의 테스트를 JUnit5의 JUnit Platform에서 실행시킬 때 사용
+        -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
