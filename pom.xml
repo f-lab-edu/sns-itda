@@ -30,6 +30,59 @@
         </dependency>
 
         <!--
+        spring-boot-starter-jdbc
+        : HikariCP 커넥션 풀에서 JDBC를 사용하기 위한 스타터
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>2.3.1.RELEASE</version>
+        </dependency>
+
+        <!--
+        mysql-connector-java
+        : MySQL용 JDBC Type 4 드라이버
+        -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.20</version>
+        </dependency>
+
+        <!--
+        mybatis
+        : XML이나 애너테이션을 통해 SQL문 또는 저장 프로시저로 객체들을 매핑해주는 SQL Mapper 라이브러리
+         개발자가 작성한 SQL 명령어와 자바 객체를 매핑해주는 기능을 제공하며, 기존에 사용하던 SQL 명령어를 재사용
+        -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+            <version>3.5.5</version>
+        </dependency>
+
+        <!--
+        mybatis-spring
+        : mybatis와 spring을 편하고 간단하게 연동해주는 모듈
+          mybatis Mapper와 SqlSession을 다루고 다른 빈에 주입시켜준다.
+        -->
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
+            <version>2.0.5</version>
+        </dependency>
+
+        <!--
+        spring-jdbc
+        : 기존 JDBC의 단점을 극복할 수 있게 해주고, 간결한 형태의 API 사용법을 제공하며,
+          JDBC API에서 지원되지 않는 편리한 기능을 제공하는 JDBC
+        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>5.2.7.RELEASE</version>
+        </dependency>
+
+        <!--
         lombok
         : Model 클래스를 만들 때, getter, setter, toString 등 메서드 작성 코드를 줄여주는 JAVA 라이브러리
          여러가지 어노테이션을 기반으로 코드를 컴파일 과정에서 생성해 주는 방식으로 동작
@@ -59,6 +112,11 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
