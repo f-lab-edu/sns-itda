@@ -7,9 +7,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+/*
 @RestController
-@RequestMapping("/user")
+: @Controller에 @ResponseBody가 추가된 어노테이션
+  @RequestMapping 메소드를 처리할 때 @ResponseBody가 기본적으로 붙으면서 처리
+
+@RequestMapping
+: 요청 URL과 해당 URL을 처리할 클래스나 메소드에 연결
+ */
+@RestController
+@RequestMapping("/users")
 public class UserController {
 
     @Autowired

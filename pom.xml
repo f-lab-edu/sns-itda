@@ -42,6 +42,10 @@
         <!--
         mysql-connector-java
         : MySQL용 JDBC Type 4 드라이버
+
+        spring-jdbc
+        : 기존 JDBC의 단점을 극복할 수 있게 해주고, 간결한 형태의 API 사용법을 제공하며,
+          JDBC API에서 지원되지 않는 편리한 기능을 제공하는 JDBC
         -->
         <dependency>
             <groupId>mysql</groupId>
@@ -69,17 +73,6 @@
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis-spring</artifactId>
             <version>2.0.5</version>
-        </dependency>
-
-        <!--
-        spring-jdbc
-        : 기존 JDBC의 단점을 극복할 수 있게 해주고, 간결한 형태의 API 사용법을 제공하며,
-          JDBC API에서 지원되지 않는 편리한 기능을 제공하는 JDBC
-        -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>5.2.7.RELEASE</version>
         </dependency>
 
         <!--
