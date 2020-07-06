@@ -7,8 +7,8 @@
         VALUES(#{userId}, #{password}, #{name}, #{phoneNumber}, #{email}, #{birth})
     </insert>
 
-    <select id="checkIdDupe" parameterType="String" resultType="int">
-        SELECT COUNT(*) FROM user
+    <select id="checkIdDupe" parameterType="String" resultType="boolean">
+        SELECT COUNT(*) > 0 FROM user
         WHERE userId = #{userId}
     </select>
 </mapper>

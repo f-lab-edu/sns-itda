@@ -87,6 +87,17 @@
         </dependency>
 
         <!--
+        jbcrypt
+        : OpenBSD 스타일의 Blowfish 암호 해싱 코드를 구현한 라이브러리
+        -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
+
+        <!--
         spring-boot-starter-test
         : Spring Boot 애플리케이션을 테스트하기 위한 스타터
           JUnit, Hamcrest, Mockito를 포함

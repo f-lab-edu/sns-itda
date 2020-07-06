@@ -1,5 +1,6 @@
 package me.liiot.snsserver.controller;
 
+import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,11 @@ public class UserController {
     @GetMapping("/checkIdDupe")
     public ResponseEntity<String> checkIdDupe(@RequestParam String userId) {
 
-        int result = userService.checkIdDupe(userId);
-
-        if (result == 0) {
-            return new ResponseEntity<String>("사용 가능한 아이디", HttpStatus.OK);
-        } else {
-            return new ResponseEntity<String>("중복된 아이디", HttpStatus.CONFLICT);
+        try {
+            userService.checkIdDupe(userId);
+        } catch (NotUniqueIdException e) {
+            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         }
+        return new ResponseEntity<String>("사용 가능한 아이디", HttpStatus.OK);
     }
 }

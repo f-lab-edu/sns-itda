@@ -12,5 +12,5 @@ public interface UserMapper {
 
     void insertUser(User user);
 
-    int checkIdDupe(String userId);
+    boolean checkIdDupe(String userId);
 }
