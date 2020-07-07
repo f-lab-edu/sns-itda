@@ -11,4 +11,16 @@
         SELECT COUNT(*) > 0 FROM user
         WHERE userId = #{userId}
     </select>
+
+    <select id="getPassword" parameterType="String" resultType="String">
+        SELECT password FROM user
+        WHERE userId = #{userId}
+    </select>
+
+    <select id="getUser" parameterType="me.liiot.snsserver.model.UserLoginInfo"
+            resultType="me.liiot.snsserver.model.User">
+        SELECT userId, password, name, phoneNumber, email, birth
+        FROM user
+        WHERE userId = #{userId}
+    </select>
 </mapper>

@@ -2,11 +2,14 @@ package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.UserLoginInfo;
 import me.liiot.snsserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 /*
 @RestController
@@ -23,7 +26,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("/signup")
+    @PostMapping
     public ResponseEntity<String> signUpUser(User user) {
 
         userService.signUpUser(user);
@@ -31,7 +34,7 @@ public class UserController {
         return new ResponseEntity<String>("회원가입 완료", HttpStatus.CREATED);
     }
 
-    @GetMapping("/checkIdDupe")
+    @GetMapping
     public ResponseEntity<String> checkIdDupe(@RequestParam String userId) {
 
         try {
@@ -40,5 +43,19 @@ public class UserController {
             return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
         }
         return new ResponseEntity<String>("사용 가능한 아이디", HttpStatus.OK);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> loginUser(UserLoginInfo userLoginInfo,
+                                            HttpSession httpSession) {
+
+        User user = userService.loginUser(userLoginInfo);
+
+        if (user == null) {
+            return new ResponseEntity<String>("아이디나 비밀번호가 틀렸습니다.", HttpStatus.UNAUTHORIZED);
+        } else {
+            httpSession.setAttribute("user", user);
+            return new ResponseEntity<String>("로그인 완료", HttpStatus.OK);
+        }
     }
 }

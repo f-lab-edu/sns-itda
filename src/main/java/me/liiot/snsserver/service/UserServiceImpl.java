@@ -3,6 +3,7 @@ package me.liiot.snsserver.service;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.UserLoginInfo;
 import me.liiot.snsserver.tool.PasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,5 +36,18 @@ public class UserServiceImpl implements UserService {
         if (isDuplicated) {
             throw new NotUniqueIdException("중복된 아이디입니다.");
         }
+    }
+
+    @Override
+    public User loginUser(UserLoginInfo userLoginInfo) {
+
+        String storedPassword = userMapper.getPassword(userLoginInfo.getUserId());
+
+        if (storedPassword == null || !passwordEncryptor.match(userLoginInfo.getPassword(), storedPassword)) {
+            return null;
+        }
+
+        User user = userMapper.getUser(userLoginInfo);
+        return user;
     }
 }
