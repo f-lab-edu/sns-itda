@@ -6,5 +6,5 @@ public interface UserService {
 
     public void signUpUser(User user);
 
-    public void checkIdDupe(String userId);
+    public void checkUserIdDupe(String userId);
 }

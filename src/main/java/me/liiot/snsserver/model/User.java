@@ -1,37 +1,37 @@
 package me.liiot.snsserver.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import me.liiot.snsserver.util.PasswordEncryptor;
 
 import java.sql.Date;
 
 /*
-@Data
-: @Getter, @Setter, @RequiredArgsConstructor, @ToString, @EqualsAndHashCode을 한꺼번에 설정
-
-@AllArgsConstructor
-: 모든 필드 값을 파라미터로 받는 생성자 생성
-
-@NoArgsConstructor
-: 파라미터가 없는 기본 생성자를 생성
+@Getter
+: 각 필드에 대한 접근자 메소드를 생성
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Getter
 public class User {
 
-    private int id;
+    private final String userId;
 
-    private String userId;
+    private final String password;
 
-    private String password;
+    private final String name;
 
-    private String name;
+    private final String phoneNumber;
 
-    private String phoneNumber;
+    private final String email;
 
-    private String email;
+    private final Date birth;
 
-    private Date birth;
+    public User(String userId, String password, String name,
+                String phoneNumber, String email, Date birth) {
+
+        this.userId = userId;
+        this.password = PasswordEncryptor.encrypt(password);
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.birth = birth;
+    }
 }
