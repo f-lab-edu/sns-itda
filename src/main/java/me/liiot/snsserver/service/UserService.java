@@ -9,5 +9,5 @@ public interface UserService {
 
     public void checkUserIdDupe(String userId);
 
-    public User loginUser(UserLoginInfo userLoginInfo);
+    public User getLoginUser(UserLoginInfo userLoginInfo);
 }

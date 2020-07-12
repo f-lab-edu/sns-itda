@@ -23,9 +23,12 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ResponseEntity RESPONSEOK = new ResponseEntity(HttpStatus.OK);
-    private final ResponseEntity RESPONSECREATED = new ResponseEntity(HttpStatus.CREATED);
-    private final ResponseEntity RESPONSECONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
+    private final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
+    private final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
+
+    private final String SESSION_KEY_USER = "user";
 
     @Autowired
     private UserService userService;
@@ -35,7 +38,7 @@ public class UserController {
 
         userService.signUpUser(user);
 
-        return RESPONSECREATED;
+        return RESPONSE_CREATED;
     }
 
     @GetMapping("/{userId}/exists")
@@ -44,22 +47,22 @@ public class UserController {
         try {
             userService.checkUserIdDupe(userId);
         } catch (NotUniqueIdException e) {
-            return RESPONSECONFLICT;
+            return RESPONSE_CONFLICT;
         }
-        return RESPONSEOK;
+        return RESPONSE_OK;
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(UserLoginInfo userLoginInfo,
                                             HttpSession httpSession) {
 
-        User user = userService.loginUser(userLoginInfo);
+        User user = userService.getLoginUser(userLoginInfo);
 
         if (user == null) {
-            return new ResponseEntity<String>("아이디나 비밀번호가 틀렸습니다.", HttpStatus.UNAUTHORIZED);
+            return RESPONSE_UNAUTHORIZED;
         } else {
-            httpSession.setAttribute("user", user);
-            return new ResponseEntity<String>("로그인 완료", HttpStatus.OK);
+            httpSession.setAttribute(SESSION_KEY_USER, user);
+            return RESPONSE_OK;
         }
     }
 }

@@ -1,15 +1,16 @@
 package me.liiot.snsserver.model;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import me.liiot.snsserver.util.PasswordEncryptor;
 
-@Data
+import java.sql.Date;
+
+@Getter
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserLoginInfo {
 
-    public String userId;
+    public final String userId;
 
-    public String password;
+    public final String password;
 }
