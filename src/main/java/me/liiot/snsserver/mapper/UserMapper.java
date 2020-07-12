@@ -13,7 +13,7 @@ public interface UserMapper {
 
     void insertUser(User user);
 
-    boolean checkIdDupe(String userId);
+    boolean isExistUserId(String userId);
 
     String getPassword(String userId);
 

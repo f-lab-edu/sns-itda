@@ -7,9 +7,9 @@
         VALUES(#{userId}, #{password}, #{name}, #{phoneNumber}, #{email}, #{birth})
     </insert>
 
-    <select id="checkIdDupe" parameterType="String" resultType="boolean">
-        SELECT COUNT(*) > 0 FROM user
-        WHERE userId = #{userId}
+    <select id="isExistUserId" parameterType="String" resultType="boolean">
+        SELECT EXISTS
+        (SELECT userId FROM user WHERE userId=#{userId});
     </select>
 
     <select id="getPassword" parameterType="String" resultType="String">

@@ -23,6 +23,10 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
+    private final ResponseEntity RESPONSEOK = new ResponseEntity(HttpStatus.OK);
+    private final ResponseEntity RESPONSECREATED = new ResponseEntity(HttpStatus.CREATED);
+    private final ResponseEntity RESPONSECONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+
     @Autowired
     private UserService userService;
 
@@ -31,18 +35,18 @@ public class UserController {
 
         userService.signUpUser(user);
 
-        return new ResponseEntity<String>("회원가입 완료", HttpStatus.CREATED);
+        return RESPONSECREATED;
     }
 
-    @GetMapping
-    public ResponseEntity<String> checkIdDupe(@RequestParam String userId) {
+    @GetMapping("/{userId}/exists")
+    public ResponseEntity<String> checkUserIdDupe(@PathVariable String userId) {
 
         try {
-            userService.checkIdDupe(userId);
+            userService.checkUserIdDupe(userId);
         } catch (NotUniqueIdException e) {
-            return new ResponseEntity<String>(e.getMessage(), HttpStatus.CONFLICT);
+            return RESPONSECONFLICT;
         }
-        return new ResponseEntity<String>("사용 가능한 아이디", HttpStatus.OK);
+        return RESPONSEOK;
     }
 
     @PostMapping("/login")

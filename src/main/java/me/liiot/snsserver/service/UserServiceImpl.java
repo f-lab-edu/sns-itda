@@ -16,24 +16,24 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Autowired
     private UserMapper userMapper;
 
     @Autowired
-    private PasswordEncryptor passwordEncryptor;
+    public UserServiceImpl(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
 
     @Override
     public void signUpUser(User user) {
 
-        user.setPassword(passwordEncryptor.encrypt(user.getPassword()));
         userMapper.insertUser(user);
     }
 
     @Override
-    public void checkIdDupe(String userId) throws NotUniqueIdException {
-        boolean isDuplicated = userMapper.checkIdDupe(userId);
+    public void checkUserIdDupe(String userId) throws NotUniqueIdException {
+        boolean isExistUserId = userMapper.isExistUserId(userId);
 
-        if (isDuplicated) {
+        if (isExistUserId) {
             throw new NotUniqueIdException("중복된 아이디입니다.");
         }
     }
