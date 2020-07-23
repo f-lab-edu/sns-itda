@@ -4,6 +4,7 @@ import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.model.UserLoginInfo;
 import me.liiot.snsserver.service.UserService;
+import me.liiot.snsserver.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,18 +24,16 @@ import javax.servlet.http.HttpSession;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
-    private final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
-    private final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
-    private final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
-
-    private final String SESSION_KEY_USER = "user";
+    private static final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
+    private static final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
+    private static final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private static final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
     @Autowired
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<String> signUpUser(User user) {
+    public ResponseEntity signUpUser(User user) {
 
         userService.signUpUser(user);
 
@@ -42,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/exists")
-    public ResponseEntity<String> checkUserIdDupe(@PathVariable String userId) {
+    public ResponseEntity checkUserIdDupe(@PathVariable String userId) {
 
         try {
             userService.checkUserIdDupe(userId);
@@ -53,7 +52,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(UserLoginInfo userLoginInfo,
+    public ResponseEntity loginUser(UserLoginInfo userLoginInfo,
                                             HttpSession httpSession) {
 
         User user = userService.getLoginUser(userLoginInfo);
@@ -61,8 +60,15 @@ public class UserController {
         if (user == null) {
             return RESPONSE_UNAUTHORIZED;
         } else {
-            httpSession.setAttribute(SESSION_KEY_USER, user);
+            httpSession.setAttribute(SessionKey.USER, user);
             return RESPONSE_OK;
         }
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity logoutUser(HttpSession httpSession) {
+
+        httpSession.invalidate();
+        return RESPONSE_OK;
     }
 }
