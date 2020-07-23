@@ -26,7 +26,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public void signUpUser(User user) {
 
-        userMapper.insertUser(user);
+        String encryptedPassword = PasswordEncryptor.encrypt(user.getPassword());
+
+        User encryptedUser = new User(
+                user.getUserId(),
+                encryptedPassword,
+                user.getName(),
+                user.getPhoneNumber(),
+                user.getEmail(),
+                user.getBirth()
+                );
+
+        userMapper.insertUser(encryptedUser);
     }
 
     @Override
