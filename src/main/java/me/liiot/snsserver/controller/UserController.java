@@ -20,9 +20,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ResponseEntity RESPONSEOK = new ResponseEntity(HttpStatus.OK);
-    private final ResponseEntity RESPONSECREATED = new ResponseEntity(HttpStatus.CREATED);
-    private final ResponseEntity RESPONSECONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
+    private final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
+    private final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
 
     @Autowired
     private UserService userService;
@@ -32,7 +32,7 @@ public class UserController {
 
         userService.signUpUser(user);
 
-        return RESPONSECREATED;
+        return RESPONSE_CREATED;
     }
 
     @GetMapping("/{userId}/exists")
@@ -41,8 +41,8 @@ public class UserController {
         try {
             userService.checkUserIdDupe(userId);
         } catch (NotUniqueIdException e) {
-            return RESPONSECONFLICT;
+            return RESPONSE_CONFLICT;
         }
-        return RESPONSEOK;
+        return RESPONSE_OK;
     }
 }

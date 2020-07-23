@@ -3,6 +3,7 @@ package me.liiot.snsserver.service;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.util.PasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,18 @@ public class UserServiceImpl implements UserService {
     @Override
     public void signUpUser(User user) {
 
-        userMapper.insertUser(user);
+        String encryptedPassword = PasswordEncryptor.encrypt(user.getPassword());
+
+        User encryptedUser = new User(
+                user.getUserId(),
+                encryptedPassword,
+                user.getName(),
+                user.getPhoneNumber(),
+                user.getEmail(),
+                user.getBirth()
+                );
+
+        userMapper.insertUser(encryptedUser);
     }
 
     @Override
