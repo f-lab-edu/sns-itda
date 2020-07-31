@@ -27,14 +27,14 @@ public class UserServiceImpl implements UserService {
 
         String encryptedPassword = PasswordEncryptor.encrypt(user.getPassword());
 
-        User encryptedUser = new User(
-                user.getUserId(),
-                encryptedPassword,
-                user.getName(),
-                user.getPhoneNumber(),
-                user.getEmail(),
-                user.getBirth()
-                );
+        User encryptedUser = User.builder()
+                .userId(user.getUserId())
+                .password(encryptedPassword)
+                .name(user.getName())
+                .phoneNumber(user.getPhoneNumber())
+                .email(user.getEmail())
+                .birth(user.getBirth())
+                .build();
 
         userMapper.insertUser(encryptedUser);
     }

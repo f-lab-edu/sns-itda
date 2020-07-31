@@ -1,6 +1,7 @@
 package me.liiot.snsserver.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.sql.Date;
@@ -11,8 +12,12 @@ import java.sql.Date;
 
 @AllArgsConstructor
 : 모든 필드 값을 파라미터로 받는 생성자 생성
+
+@Builder
+: 해당 클래스에 대한 빌더 패턴 코드 생성
  */
 @Getter
+@Builder
 @AllArgsConstructor
 public class User {
 
