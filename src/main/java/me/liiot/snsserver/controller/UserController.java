@@ -33,7 +33,7 @@ public class UserController {
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity signUpUser(User user) {
+    public ResponseEntity<Void> signUpUser(User user) {
 
         userService.signUpUser(user);
 
@@ -41,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}/exists")
-    public ResponseEntity checkUserIdDupe(@PathVariable String userId) {
+    public ResponseEntity<Void> checkUserIdDupe(@PathVariable String userId) {
 
         try {
             userService.checkUserIdDupe(userId);
