@@ -2,9 +2,6 @@ package me.liiot.snsserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import me.liiot.snsserver.util.PasswordEncryptor;
-
-import java.sql.Date;
 
 @Getter
 @AllArgsConstructor

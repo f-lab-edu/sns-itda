@@ -52,8 +52,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity loginUser(UserLoginInfo userLoginInfo,
-                                            HttpSession httpSession) {
+    public ResponseEntity<Void> loginUser(UserLoginInfo userLoginInfo,
+                                          HttpSession httpSession) {
 
         User user = userService.getLoginUser(userLoginInfo);
 
@@ -66,7 +66,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseEntity logoutUser(HttpSession httpSession) {
+    public ResponseEntity<Void> logoutUser(HttpSession httpSession) {
 
         httpSession.invalidate();
         return RESPONSE_OK;
