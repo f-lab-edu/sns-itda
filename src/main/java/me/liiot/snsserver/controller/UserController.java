@@ -3,6 +3,7 @@ package me.liiot.snsserver.controller;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,6 @@ public class UserController {
     public ResponseEntity<Void> signUpUser(User user) {
 
         userService.signUpUser(user);
-
         return RESPONSE_CREATED;
     }
 
@@ -70,5 +70,19 @@ public class UserController {
 
         httpSession.invalidate();
         return RESPONSE_OK;
+    }
+
+    @PutMapping("/profile/{userId}")
+    public ResponseEntity<Void> updateUser(@PathVariable String userId,
+                                           UserUpdateParam userUpdateParam,
+                                           HttpSession httpSession) {
+
+        User currentUser = (User) httpSession.getAttribute("user");
+        if (currentUser == null) {
+            return RESPONSE_UNAUTHORIZED;
+        } else {
+            userService.updateUser(userId, userUpdateParam);
+            return RESPONSE_OK;
+        }
     }
 }

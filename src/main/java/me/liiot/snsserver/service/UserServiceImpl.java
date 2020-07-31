@@ -2,8 +2,7 @@ package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,5 +61,31 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.getUser(userLoginInfo);
         return user;
+    }
+
+    @Override
+    public void updateUser(String currentUserId, UserUpdateParam userUpdateParam) {
+
+        UserUpdateInfo userUpdateInfo = UserUpdateInfo.builder()
+                .userId(currentUserId)
+                .name(userUpdateParam.getName())
+                .phoneNumber(userUpdateParam.getPhoneNumber())
+                .email(userUpdateParam.getEmail())
+                .birth(userUpdateParam.getBirth())
+                .build();
+
+        userMapper.updateUser(userUpdateInfo);
+    }
+
+    @Override
+    public void updateUserPassword(User currentUser, UserPasswordUpdateParam userPasswordUpdateParam) {
+
+        String currentUserId = currentUser.getUserId();
+        String currentUserPassword = currentUser.getPassword();
+
+        boolean isValidPassword = PasswordEncryptor.isMatch(
+                userPasswordUpdateParam.getExistPassword(),
+                currentUserPassword
+        );
     }
 }

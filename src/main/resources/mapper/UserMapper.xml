@@ -23,4 +23,16 @@
         FROM user
         WHERE userId = #{userId}
     </select>
+    
+    <update id="updateUser" parameterType="me.liiot.snsserver.model.UserUpdateInfo">
+        UPDATE user
+        SET name = #{name}, phoneNumber = #{phoneNumber}, email = #{email}, birth = #{birth}
+        WHERE userId = #{userId}
+    </update>
+
+    <update id="updateUserPassword" parameterType="me.liiot.snsserver.model.UserLoginInfo">
+        UPDATE user
+        SET password = #{password}
+        WHERE userId = #{userId}
+    </update>
 </mapper>
