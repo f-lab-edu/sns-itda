@@ -23,4 +23,6 @@ public interface UserMapper {
     void updateUser(UserUpdateInfo userUpdateInfo);
 
     void updateUserPassword(UserLoginInfo userLoginInfo);
+
+    void deleteUser(String userId);
 }

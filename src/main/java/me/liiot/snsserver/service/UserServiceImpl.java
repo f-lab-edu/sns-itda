@@ -1,5 +1,6 @@
 package me.liiot.snsserver.service;
 
+import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
@@ -64,7 +65,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(String currentUserId, UserUpdateParam userUpdateParam) {
+    public void updateUser(String currentUserId,
+                           UserUpdateParam userUpdateParam) {
 
         UserUpdateInfo userUpdateInfo = UserUpdateInfo.builder()
                 .userId(currentUserId)
@@ -78,7 +80,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserPassword(User currentUser, UserPasswordUpdateParam userPasswordUpdateParam) {
+    public void updateUserPassword(User currentUser,
+                                   UserPasswordUpdateParam userPasswordUpdateParam)
+            throws InValidValueException {
 
         String currentUserId = currentUser.getUserId();
         String currentUserPassword = currentUser.getPassword();
@@ -87,5 +91,30 @@ public class UserServiceImpl implements UserService {
                 userPasswordUpdateParam.getExistPassword(),
                 currentUserPassword
         );
+
+        if (!isValidPassword ||
+            userPasswordUpdateParam.getExistPassword().equals(userPasswordUpdateParam.getNewPassword()) ||
+            !userPasswordUpdateParam.getNewPassword().equals(userPasswordUpdateParam.getCheckNewPassword())) {
+            throw new InValidValueException();
+        }
+
+        String encryptedPassword = PasswordEncryptor.encrypt(userPasswordUpdateParam.getNewPassword());
+        UserLoginInfo userLoginInfo = new UserLoginInfo(currentUserId, encryptedPassword);
+
+        userMapper.updateUserPassword(userLoginInfo);
+    }
+
+    @Override
+    public void deleteUser(User currentUser, String inputPassword) throws InValidValueException {
+        String currentUserID = currentUser.getUserId();
+        String currentUserPassword = currentUser.getPassword();
+
+        boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUserPassword);
+
+        if (!isValidPassword) {
+            throw new InValidValueException();
+        }
+
+        userMapper.deleteUser(currentUserID);
     }
 }

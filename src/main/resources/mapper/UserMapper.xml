@@ -35,4 +35,9 @@
         SET password = #{password}
         WHERE userId = #{userId}
     </update>
+
+    <delete id="deleteUser" parameterType="String">
+        DELETE FROM user
+        WHERE userId = #{userId}
+    </delete>
 </mapper>

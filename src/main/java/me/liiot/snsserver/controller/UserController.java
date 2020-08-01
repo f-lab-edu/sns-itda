@@ -1,8 +1,10 @@
 package me.liiot.snsserver.controller;
 
+import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.UserPasswordUpdateParam;
 import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.SessionKey;
@@ -83,6 +85,44 @@ public class UserController {
         } else {
             userService.updateUser(userId, userUpdateParam);
             return RESPONSE_OK;
+        }
+    }
+
+    @PutMapping("/profile/{userId}/password")
+    public ResponseEntity<Void> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
+                                                   HttpSession httpSession) {
+
+        User currentUser = (User) httpSession.getAttribute("user");
+        if (currentUser == null) {
+            return RESPONSE_UNAUTHORIZED;
+        } else {
+            try {
+                userService.updateUserPassword(currentUser, userPasswordUpdateParam);
+                httpSession.invalidate();
+
+                return RESPONSE_OK;
+            } catch (InValidValueException e) {
+                return RESPONSE_CONFLICT;
+            }
+        }
+    }
+
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
+                                           HttpSession httpSession) {
+
+        User currentUser = (User) httpSession.getAttribute("user");
+        if (currentUser == null) {
+            return RESPONSE_UNAUTHORIZED;
+        } else {
+            try {
+                userService.deleteUser(currentUser, inputPassword);
+                httpSession.invalidate();
+
+                return RESPONSE_OK;
+            } catch (InValidValueException e) {
+                return RESPONSE_UNAUTHORIZED;
+            }
         }
     }
 }
