@@ -29,3 +29,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Database config ###
+db-secret.properties
