@@ -2,11 +2,15 @@ package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.UserLoginInfo;
 import me.liiot.snsserver.service.UserService;
+import me.liiot.snsserver.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpSession;
 
 /*
 @RestController
@@ -20,9 +24,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/users")
 public class UserController {
 
-    private final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
-    private final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
-    private final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private static final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
+    private static final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
+    private static final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
+    private static final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
 
     @Autowired
     private UserService userService;
@@ -43,6 +48,27 @@ public class UserController {
         } catch (NotUniqueIdException e) {
             return RESPONSE_CONFLICT;
         }
+        return RESPONSE_OK;
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Void> loginUser(UserLoginInfo userLoginInfo,
+                                          HttpSession httpSession) {
+
+        User user = userService.getLoginUser(userLoginInfo);
+
+        if (user == null) {
+            return RESPONSE_UNAUTHORIZED;
+        } else {
+            httpSession.setAttribute(SessionKey.USER, user);
+            return RESPONSE_OK;
+        }
+    }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logoutUser(HttpSession httpSession) {
+
+        httpSession.invalidate();
         return RESPONSE_OK;
     }
 }
