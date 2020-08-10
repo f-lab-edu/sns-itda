@@ -1,7 +1,7 @@
 package me.liiot.snsserver.mapper;
 
 import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.UserIdAndPassword;
 import me.liiot.snsserver.model.UserUpdateInfo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -18,11 +18,11 @@ public interface UserMapper {
 
     String getPassword(String userId);
 
-    User getUser(UserLoginInfo userLoginInfo);
+    User getUser(UserIdAndPassword userIdAndPassword);
 
     void updateUser(UserUpdateInfo userUpdateInfo);
 
-    void updateUserPassword(UserLoginInfo userLoginInfo);
+    void updateUserPassword(UserIdAndPassword userIdAndPassword);
 
     void deleteUser(String userId);
 }

@@ -5,6 +5,7 @@ import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,17 +51,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getLoginUser(UserLoginInfo userLoginInfo) {
+    public User getLoginUser(UserIdAndPassword userIdAndPassword) {
 
-        String storedPassword = userMapper.getPassword(userLoginInfo.getUserId());
+        String storedPassword = userMapper.getPassword(userIdAndPassword.getUserId());
 
-        boolean isValidPassword = PasswordEncryptor.isMatch(userLoginInfo.getPassword(), storedPassword);
+        boolean isValidPassword = PasswordEncryptor.isMatch(userIdAndPassword.getPassword(), storedPassword);
 
         if (storedPassword == null || !isValidPassword) {
             return null;
         }
 
-        User user = userMapper.getUser(userLoginInfo);
+        User user = userMapper.getUser(userIdAndPassword);
         return user;
     }
 
@@ -93,15 +94,15 @@ public class UserServiceImpl implements UserService {
         );
 
         if (!isValidPassword ||
-            userPasswordUpdateParam.getExistPassword().equals(userPasswordUpdateParam.getNewPassword()) ||
-            !userPasswordUpdateParam.getNewPassword().equals(userPasswordUpdateParam.getCheckNewPassword())) {
-            throw new InValidValueException();
+            StringUtils.equals(userPasswordUpdateParam.getExistPassword(), userPasswordUpdateParam.getNewPassword()) ||
+            !(StringUtils.equals(userPasswordUpdateParam.getNewPassword(), userPasswordUpdateParam.getCheckNewPassword()))) {
+            throw new InValidValueException("올바르지 않은 값입니다. 다시 입력해주세요.");
         }
 
         String encryptedPassword = PasswordEncryptor.encrypt(userPasswordUpdateParam.getNewPassword());
-        UserLoginInfo userLoginInfo = new UserLoginInfo(currentUserId, encryptedPassword);
+        UserIdAndPassword userIdAndPassword = new UserIdAndPassword(currentUserId, encryptedPassword);
 
-        userMapper.updateUserPassword(userLoginInfo);
+        userMapper.updateUserPassword(userIdAndPassword);
     }
 
     @Override

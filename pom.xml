@@ -96,6 +96,27 @@
             <version>0.4</version>
         </dependency>
 
+        <!--
+        commons-lang3
+        : java.lang 패키지 혹은 이에 준하는 클래스에 대한 Java 유틸리티 클래스 패키지
+        -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.10</version>
+        </dependency>
+
+        <!--
+        spring-aspects
+        : 스프링에서 AspectJ의 일부 기능을 사용할 수 있게 하는 라이브러리
+        -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aspects</artifactId>
+            <version>5.2.7.RELEASE</version>
+        </dependency>
+
+
 
         <!--
         spring-boot-starter-test

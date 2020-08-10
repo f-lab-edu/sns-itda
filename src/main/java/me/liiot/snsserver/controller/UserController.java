@@ -1,9 +1,10 @@
 package me.liiot.snsserver.controller;
 
+import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.UserIdAndPassword;
 import me.liiot.snsserver.model.UserPasswordUpdateParam;
 import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
@@ -54,17 +55,17 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginUser(UserLoginInfo userLoginInfo,
+    public ResponseEntity<Void> loginUser(UserIdAndPassword userIdAndPassword,
                                           HttpSession httpSession) {
 
-        User user = userService.getLoginUser(userLoginInfo);
+        User user = userService.getLoginUser(userIdAndPassword);
 
         if (user == null) {
             return RESPONSE_UNAUTHORIZED;
-        } else {
-            httpSession.setAttribute(SessionKey.USER, user);
-            return RESPONSE_OK;
         }
+
+        httpSession.setAttribute(SessionKey.USER, user);
+        return RESPONSE_OK;
     }
 
     @GetMapping("/logout")
@@ -74,55 +75,48 @@ public class UserController {
         return RESPONSE_OK;
     }
 
-    @PutMapping("/profile/{userId}")
-    public ResponseEntity<Void> updateUser(@PathVariable String userId,
-                                           UserUpdateParam userUpdateParam,
+    @PutMapping("/{userId}/profiles")
+    @CheckLogin
+    public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
                                            HttpSession httpSession) {
 
         User currentUser = (User) httpSession.getAttribute("user");
-        if (currentUser == null) {
-            return RESPONSE_UNAUTHORIZED;
-        } else {
-            userService.updateUser(userId, userUpdateParam);
-            return RESPONSE_OK;
-        }
+
+        userService.updateUser(currentUser.getUserId(), userUpdateParam);
+        return RESPONSE_OK;
     }
 
-    @PutMapping("/profile/{userId}/password")
-    public ResponseEntity<Void> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
+    @PutMapping("/{userId}/profiles/passwords")
+    @CheckLogin
+    public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
                                                    HttpSession httpSession) {
 
         User currentUser = (User) httpSession.getAttribute("user");
-        if (currentUser == null) {
-            return RESPONSE_UNAUTHORIZED;
-        } else {
-            try {
-                userService.updateUserPassword(currentUser, userPasswordUpdateParam);
-                httpSession.invalidate();
 
-                return RESPONSE_OK;
-            } catch (InValidValueException e) {
-                return RESPONSE_CONFLICT;
-            }
+        try {
+            userService.updateUserPassword(currentUser, userPasswordUpdateParam);
+            httpSession.invalidate();
+
+            return RESPONSE_OK;
+        } catch (InValidValueException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
 
     @DeleteMapping("/{userId}")
+    @CheckLogin
     public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
                                            HttpSession httpSession) {
 
         User currentUser = (User) httpSession.getAttribute("user");
-        if (currentUser == null) {
-            return RESPONSE_UNAUTHORIZED;
-        } else {
-            try {
-                userService.deleteUser(currentUser, inputPassword);
-                httpSession.invalidate();
 
-                return RESPONSE_OK;
-            } catch (InValidValueException e) {
-                return RESPONSE_UNAUTHORIZED;
-            }
+        try {
+            userService.deleteUser(currentUser, inputPassword);
+            httpSession.invalidate();
+
+            return RESPONSE_OK;
+        } catch (InValidValueException e) {
+            return RESPONSE_UNAUTHORIZED;
         }
     }
 }
