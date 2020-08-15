@@ -1,6 +1,7 @@
 package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.annotation.CheckLogin;
+import me.liiot.snsserver.controller.util.SessionUtil;
 import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
@@ -8,7 +9,6 @@ import me.liiot.snsserver.model.UserIdAndPassword;
 import me.liiot.snsserver.model.UserPasswordUpdateParam;
 import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
-import me.liiot.snsserver.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,38 +64,38 @@ public class UserController {
             return RESPONSE_UNAUTHORIZED;
         }
 
-        httpSession.setAttribute(SessionKey.USER, user);
+        SessionUtil.setUser(httpSession, user);
         return RESPONSE_OK;
     }
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logoutUser(HttpSession httpSession) {
 
-        httpSession.invalidate();
+        SessionUtil.deleteAllAttribute(httpSession);
         return RESPONSE_OK;
     }
 
-    @PutMapping("/{userId}/profiles")
+    @PutMapping("/myaccount")
     @CheckLogin
     public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
                                            HttpSession httpSession) {
 
-        User currentUser = (User) httpSession.getAttribute("user");
+        User currentUser = SessionUtil.getUser(httpSession);
 
         userService.updateUser(currentUser.getUserId(), userUpdateParam);
         return RESPONSE_OK;
     }
 
-    @PutMapping("/{userId}/profiles/passwords")
+    @PutMapping("/myaccount/password")
     @CheckLogin
     public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
-                                                   HttpSession httpSession) {
+                                                     HttpSession httpSession) {
 
-        User currentUser = (User) httpSession.getAttribute("user");
+        User currentUser = SessionUtil.getUser(httpSession);
 
         try {
             userService.updateUserPassword(currentUser, userPasswordUpdateParam);
-            httpSession.invalidate();
+            SessionUtil.deleteAllAttribute(httpSession);
 
             return RESPONSE_OK;
         } catch (InValidValueException e) {
@@ -103,16 +103,16 @@ public class UserController {
         }
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/myaccount")
     @CheckLogin
     public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
                                            HttpSession httpSession) {
 
-        User currentUser = (User) httpSession.getAttribute("user");
+        User currentUser = SessionUtil.getUser(httpSession);
 
         try {
             userService.deleteUser(currentUser, inputPassword);
-            httpSession.invalidate();
+            SessionUtil.deleteAllAttribute(httpSession);
 
             return RESPONSE_OK;
         } catch (InValidValueException e) {
