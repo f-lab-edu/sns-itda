@@ -1,6 +1,6 @@
 package me.liiot.snsserver.aspect;
 
-import me.liiot.snsserver.controller.util.SessionUtil;
+import me.liiot.snsserver.util.SessionKeys;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ public class CheckLoginAspect {
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         HttpSession httpSession = servletRequest.getSession();
 
-        if (httpSession.getAttribute(SessionUtil.USER) == null) {
+        if (httpSession.getAttribute(SessionKeys.USER) == null) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
     }
