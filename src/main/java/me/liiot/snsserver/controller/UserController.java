@@ -1,6 +1,7 @@
 package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.annotation.CheckLogin;
+import me.liiot.snsserver.annotation.GetCurrentUser;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
@@ -9,13 +10,10 @@ import me.liiot.snsserver.model.UserIdAndPassword;
 import me.liiot.snsserver.model.UserPasswordUpdateParam;
 import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
-import me.liiot.snsserver.util.SessionKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 /*
 @RestController
@@ -81,9 +79,7 @@ public class UserController {
     @PutMapping("/my-account")
     @CheckLogin
     public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
-                                           HttpSession httpSession) {
-
-        User currentUser = (User)httpSession.getAttribute(SessionKeys.USER);
+                                           @GetCurrentUser User currentUser) {
 
         userService.updateUser(currentUser.getUserId(), userUpdateParam);
         return RESPONSE_OK;
@@ -92,9 +88,7 @@ public class UserController {
     @PutMapping("/my-account/password")
     @CheckLogin
     public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
-                                                     HttpSession httpSession) {
-
-        User currentUser = (User)httpSession.getAttribute(SessionKeys.USER);
+                                                     @GetCurrentUser User currentUser) {
 
         try {
             userService.updateUserPassword(currentUser, userPasswordUpdateParam);
@@ -109,9 +103,7 @@ public class UserController {
     @DeleteMapping("/my-account")
     @CheckLogin
     public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
-                                           HttpSession httpSession) {
-
-        User currentUser = (User)httpSession.getAttribute(SessionKeys.USER);
+                                           @GetCurrentUser User currentUser) {
 
         try {
             userService.deleteUser(currentUser, inputPassword);
