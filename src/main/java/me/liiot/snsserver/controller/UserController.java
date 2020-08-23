@@ -1,7 +1,7 @@
 package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.annotation.CheckLogin;
-import me.liiot.snsserver.annotation.GetCurrentUser;
+import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
@@ -79,7 +79,7 @@ public class UserController {
     @PutMapping("/my-account")
     @CheckLogin
     public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
-                                           @GetCurrentUser User currentUser) {
+                                           @CurrentUser User currentUser) {
 
         userService.updateUser(currentUser.getUserId(), userUpdateParam);
         return RESPONSE_OK;
@@ -88,7 +88,7 @@ public class UserController {
     @PutMapping("/my-account/password")
     @CheckLogin
     public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
-                                                     @GetCurrentUser User currentUser) {
+                                                     @CurrentUser User currentUser) {
 
         try {
             userService.updateUserPassword(currentUser, userPasswordUpdateParam);
@@ -103,7 +103,7 @@ public class UserController {
     @DeleteMapping("/my-account")
     @CheckLogin
     public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
-                                           @GetCurrentUser User currentUser) {
+                                           @CurrentUser User currentUser) {
 
         try {
             userService.deleteUser(currentUser, inputPassword);
