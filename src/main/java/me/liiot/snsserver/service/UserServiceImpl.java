@@ -54,10 +54,12 @@ public class UserServiceImpl implements UserService {
     public User getLoginUser(UserIdAndPassword userIdAndPassword) {
 
         String storedPassword = userMapper.getPassword(userIdAndPassword.getUserId());
+        if (storedPassword == null) {
+            return null;
+        }
 
         boolean isValidPassword = PasswordEncryptor.isMatch(userIdAndPassword.getPassword(), storedPassword);
-
-        if (storedPassword == null || !isValidPassword) {
+        if (!isValidPassword) {
             return null;
         }
 
@@ -107,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(User currentUser, String inputPassword) throws InValidValueException {
-        String currentUserID = currentUser.getUserId();
+        String currentUserId = currentUser.getUserId();
         String currentUserPassword = currentUser.getPassword();
 
         boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUserPassword);
@@ -116,6 +118,6 @@ public class UserServiceImpl implements UserService {
             throw new InValidValueException();
         }
 
-        userMapper.deleteUser(currentUserID);
+        userMapper.deleteUser(currentUserId);
     }
 }
