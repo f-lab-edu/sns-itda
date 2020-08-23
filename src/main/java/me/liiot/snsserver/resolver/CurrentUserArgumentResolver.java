@@ -1,6 +1,6 @@
 package me.liiot.snsserver.resolver;
 
-import me.liiot.snsserver.annotation.GetCurrentUser;
+import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.util.SessionKeys;
 import org.springframework.core.MethodParameter;
@@ -16,7 +16,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 
     @Override
     public boolean supportsParameter(MethodParameter methodParameter) {
-        return methodParameter.hasParameterAnnotation(GetCurrentUser.class);
+        return methodParameter.hasParameterAnnotation(CurrentUser.class);
     }
 
     @Override
