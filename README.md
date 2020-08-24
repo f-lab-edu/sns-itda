@@ -17,6 +17,7 @@
 
 예시)
 
+![Part of Application UI](https://user-images.githubusercontent.com/50859560/91076861-153e6d00-e67b-11ea-97e3-a23e9b925ab8.jpg)
 
 
 
