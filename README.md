@@ -13,7 +13,11 @@
 
 ### Application UI
 
-☞ [https://github.com/f-lab-edu/sns-server/wiki/Application-UI](https://github.com/f-lab-edu/sns-server/wiki/Application-UI)
+자세한 사항은 ☞ [https://github.com/f-lab-edu/sns-server/wiki/Application-UI](https://github.com/f-lab-edu/sns-server/wiki/Application-UI)
+
+예시)
+
+
 
 
 
@@ -29,6 +33,6 @@
 
 ### 프로젝트 진행 중 발생한 Technical Issue
 
-☞ [https://github.com/f-lab-edu/sns-server/wiki/Technical-Issue](https://github.com/f-lab-edu/sns-server/wiki/Technical-Issue)
+자세한 사항은 ☞ [https://github.com/f-lab-edu/sns-server/wiki/Technical-Issue](https://github.com/f-lab-edu/sns-server/wiki/Technical-Issue)
 
 * 분산 처리 환경에서 대용량 트래픽을 견디기 위한 로그인 기능 구현

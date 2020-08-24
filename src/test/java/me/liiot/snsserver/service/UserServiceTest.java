@@ -60,10 +60,10 @@ class UserServiceTest {
         verify(userMapper).insertUser(any(User.class));
     }
 
-//    @Test
+    @Test
     public void checkUserIdDupeTestWithoutDupe() {
 
-        when(not(userMapper.isExistUserId(testUser.getUserId()))).thenReturn(false);
+        when(userMapper.isExistUserId("test2")).thenReturn(false);
 
         assertDoesNotThrow(() -> {
             userService.checkUserIdDupe("test2");
@@ -89,7 +89,7 @@ class UserServiceTest {
 
         UserIdAndPassword userIdAndPassword = new UserIdAndPassword(testUser.getUserId(), testUser.getPassword());
 
-        when(userMapper.getPassword(encryptedTestUser.getUserId())).thenReturn(encryptedTestUser.getPassword());
+        when(userMapper.getPassword(userIdAndPassword.userId)).thenReturn(encryptedTestUser.getPassword());
         when(userMapper.getUser(userIdAndPassword)).thenReturn(encryptedTestUser);
 
         User loginUser = userService.getLoginUser(userIdAndPassword);
@@ -98,14 +98,12 @@ class UserServiceTest {
         verify(userMapper).getUser(userIdAndPassword);
     }
 
-//    @Test
+    @Test
     public void getLoginUserTestWithFail() {
 
-        UserIdAndPassword rightUserIdAndPassword = new UserIdAndPassword(testUser.getUserId(), testUser.getPassword());
         UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test2", "5678");
 
-        when(not(userMapper.getPassword(encryptedTestUser.getUserId()))).thenReturn(null);
-        when(not(userMapper.getUser(rightUserIdAndPassword))).thenReturn(null);
+        when(userMapper.getPassword(userIdAndPassword.userId)).thenReturn(null);
 
         User loginUser = userService.getLoginUser(userIdAndPassword);
         assertEquals(null, loginUser);
