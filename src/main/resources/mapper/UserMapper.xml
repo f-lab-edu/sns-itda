@@ -17,10 +17,27 @@
         WHERE userId = #{userId}
     </select>
 
-    <select id="getUser" parameterType="me.liiot.snsserver.model.UserLoginInfo"
+    <select id="getUser" parameterType="me.liiot.snsserver.model.UserIdAndPassword"
             resultType="me.liiot.snsserver.model.User">
         SELECT userId, password, name, phoneNumber, email, birth
         FROM user
         WHERE userId = #{userId}
     </select>
+    
+    <update id="updateUser" parameterType="me.liiot.snsserver.model.UserUpdateInfo">
+        UPDATE user
+        SET name = #{name}, phoneNumber = #{phoneNumber}, email = #{email}, birth = #{birth}
+        WHERE userId = #{userId}
+    </update>
+
+    <update id="updateUserPassword" parameterType="me.liiot.snsserver.model.UserIdAndPassword">
+        UPDATE user
+        SET password = #{password}
+        WHERE userId = #{userId}
+    </update>
+
+    <delete id="deleteUser" parameterType="String">
+        DELETE FROM user
+        WHERE userId = #{userId}
+    </delete>
 </mapper>

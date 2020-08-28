@@ -1,16 +1,19 @@
 package me.liiot.snsserver.controller;
 
+import me.liiot.snsserver.annotation.CheckLogin;
+import me.liiot.snsserver.annotation.CurrentUser;
+import me.liiot.snsserver.service.LoginService;
+import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.UserIdAndPassword;
+import me.liiot.snsserver.model.UserPasswordUpdateParam;
+import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
-import me.liiot.snsserver.util.SessionKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 /*
 @RestController
@@ -32,11 +35,13 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private LoginService loginService;
+
     @PostMapping
     public ResponseEntity<Void> signUpUser(User user) {
 
         userService.signUpUser(user);
-
         return RESPONSE_CREATED;
     }
 
@@ -52,23 +57,61 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginUser(UserLoginInfo userLoginInfo,
-                                          HttpSession httpSession) {
+    public ResponseEntity<Void> loginUser(UserIdAndPassword userIdAndPassword) {
 
-        User user = userService.getLoginUser(userLoginInfo);
+        User user = userService.getLoginUser(userIdAndPassword);
 
         if (user == null) {
             return RESPONSE_UNAUTHORIZED;
-        } else {
-            httpSession.setAttribute(SessionKey.USER, user);
-            return RESPONSE_OK;
         }
+
+        loginService.loginUser(user);
+        return RESPONSE_OK;
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<Void> logoutUser(HttpSession httpSession) {
+    public ResponseEntity<Void> logoutUser() {
 
-        httpSession.invalidate();
+        loginService.logoutUser();
         return RESPONSE_OK;
+    }
+
+    @PutMapping("/my-account")
+    @CheckLogin
+    public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
+                                           @CurrentUser User currentUser) {
+
+        userService.updateUser(currentUser.getUserId(), userUpdateParam);
+        return RESPONSE_OK;
+    }
+
+    @PutMapping("/my-account/password")
+    @CheckLogin
+    public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
+                                                     @CurrentUser User currentUser) {
+
+        try {
+            userService.updateUserPassword(currentUser, userPasswordUpdateParam);
+            loginService.logoutUser();
+
+            return RESPONSE_OK;
+        } catch (InValidValueException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        }
+    }
+
+    @DeleteMapping("/my-account")
+    @CheckLogin
+    public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
+                                           @CurrentUser User currentUser) {
+
+        try {
+            userService.deleteUser(currentUser, inputPassword);
+            loginService.logoutUser();
+
+            return RESPONSE_OK;
+        } catch (InValidValueException e) {
+            return RESPONSE_UNAUTHORIZED;
+        }
     }
 }

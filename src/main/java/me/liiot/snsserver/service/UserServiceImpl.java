@@ -1,10 +1,11 @@
 package me.liiot.snsserver.service;
 
+import me.liiot.snsserver.exception.InValidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserLoginInfo;
+import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,17 +51,71 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getLoginUser(UserLoginInfo userLoginInfo) {
+    public User getLoginUser(UserIdAndPassword userIdAndPassword) {
 
-        String storedPassword = userMapper.getPassword(userLoginInfo.getUserId());
+        String storedPassword = userMapper.getPassword(userIdAndPassword.getUserId());
 
-        boolean isValidPassword = PasswordEncryptor.isMatch(userLoginInfo.getPassword(), storedPassword);
+        boolean isValidPassword = PasswordEncryptor.isMatch(userIdAndPassword.getPassword(), storedPassword);
 
         if (storedPassword == null || !isValidPassword) {
             return null;
         }
 
-        User user = userMapper.getUser(userLoginInfo);
+        User user = userMapper.getUser(userIdAndPassword);
         return user;
+    }
+
+    @Override
+    public void updateUser(String currentUserId,
+                           UserUpdateParam userUpdateParam) {
+
+        UserUpdateInfo userUpdateInfo = UserUpdateInfo.builder()
+                .userId(currentUserId)
+                .name(userUpdateParam.getName())
+                .phoneNumber(userUpdateParam.getPhoneNumber())
+                .email(userUpdateParam.getEmail())
+                .birth(userUpdateParam.getBirth())
+                .build();
+
+        userMapper.updateUser(userUpdateInfo);
+    }
+
+    @Override
+    public void updateUserPassword(User currentUser,
+                                   UserPasswordUpdateParam userPasswordUpdateParam)
+            throws InValidValueException {
+
+        String currentUserId = currentUser.getUserId();
+        String currentUserPassword = currentUser.getPassword();
+
+        boolean isValidPassword = PasswordEncryptor.isMatch(
+                userPasswordUpdateParam.getExistPassword(),
+                currentUserPassword
+        );
+
+        if (!isValidPassword ||
+            StringUtils.equals(userPasswordUpdateParam.getExistPassword(), userPasswordUpdateParam.getNewPassword()) ||
+            !(StringUtils.equals(userPasswordUpdateParam.getNewPassword(), userPasswordUpdateParam.getCheckNewPassword()))) {
+            throw new InValidValueException("올바르지 않은 값입니다. 다시 입력해주세요.");
+        }
+
+        String encryptedPassword = PasswordEncryptor.encrypt(userPasswordUpdateParam.getNewPassword());
+        UserIdAndPassword userIdAndPassword = new UserIdAndPassword(currentUserId, encryptedPassword);
+
+        userMapper.updateUserPassword(userIdAndPassword);
+    }
+
+    @Override
+    public void deleteUser(User currentUser, String inputPassword) throws InValidValueException {
+        String currentUserID = currentUser.getUserId();
+        String currentUserPassword = currentUser.getPassword();
+
+        boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUserPassword);
+
+        if (!isValidPassword) {
+            throw new InValidValueException();
+        }
+
+        userMapper.deleteUser(currentUserID);
     }
 }
