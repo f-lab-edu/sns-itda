@@ -2,6 +2,7 @@ package me.liiot.snsserver.mapper;
 
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.model.UserIdAndPassword;
+import me.liiot.snsserver.model.UserSignUpParam;
 import me.liiot.snsserver.model.UserUpdateInfo;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -12,7 +13,7 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface UserMapper {
 
-    void insertUser(User user);
+    void insertUser(UserSignUpParam userSignUpParam);
 
     boolean isExistUserId(String userId);
 

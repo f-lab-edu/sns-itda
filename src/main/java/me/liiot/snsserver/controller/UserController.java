@@ -2,18 +2,17 @@ package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
+import me.liiot.snsserver.exception.FileUploadException;
+import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.service.LoginService;
-import me.liiot.snsserver.exception.InValidValueException;
+import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserIdAndPassword;
-import me.liiot.snsserver.model.UserPasswordUpdateParam;
-import me.liiot.snsserver.model.UserUpdateParam;
 import me.liiot.snsserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
 @RestController
@@ -39,9 +38,9 @@ public class UserController {
     private LoginService loginService;
 
     @PostMapping
-    public ResponseEntity<Void> signUpUser(User user) {
+    public ResponseEntity<Void> signUpUser(UserSignUpParam userSignUpParam) {
 
-        userService.signUpUser(user);
+        userService.signUpUser(userSignUpParam);
         return RESPONSE_CREATED;
     }
 
@@ -78,11 +77,17 @@ public class UserController {
 
     @PutMapping("/my-account")
     @CheckLogin
-    public ResponseEntity<Void> updateUser(UserUpdateParam userUpdateParam,
-                                           @CurrentUser User currentUser) {
+    public ResponseEntity<String> updateUser(UserUpdateParam userUpdateParam,
+                                             @RequestPart("profileImage") MultipartFile profileImage,
+                                             @CurrentUser User currentUser) {
 
-        userService.updateUser(currentUser.getUserId(), userUpdateParam);
-        return RESPONSE_OK;
+        try {
+            userService.updateUser(currentUser, userUpdateParam, profileImage);
+
+            return RESPONSE_OK;
+        } catch (FileUploadException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PutMapping("/my-account/password")
@@ -95,7 +100,7 @@ public class UserController {
             loginService.logoutUser();
 
             return RESPONSE_OK;
-        } catch (InValidValueException e) {
+        } catch (InvalidValueException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
         }
     }
@@ -110,7 +115,7 @@ public class UserController {
             loginService.logoutUser();
 
             return RESPONSE_OK;
-        } catch (InValidValueException e) {
+        } catch (InvalidValueException e) {
             return RESPONSE_UNAUTHORIZED;
         }
     }

@@ -1,6 +1,7 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.InValidValueException;
+import me.liiot.snsserver.exception.FileUploadException;
+import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
@@ -8,6 +9,7 @@ import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /*
 @Service
@@ -19,26 +21,29 @@ public class UserServiceImpl implements UserService {
 
     private UserMapper userMapper;
 
+    private FileService fileService;
+
     @Autowired
-    public UserServiceImpl(UserMapper userMapper) {
+    public UserServiceImpl(UserMapper userMapper, FileService fileService) {
         this.userMapper = userMapper;
+        this.fileService = fileService;
     }
 
     @Override
-    public void signUpUser(User user) {
+    public void signUpUser(UserSignUpParam userSignUpParam) {
 
-        String encryptedPassword = PasswordEncryptor.encrypt(user.getPassword());
+        String encryptedPassword = PasswordEncryptor.encrypt(userSignUpParam.getPassword());
 
-        User encryptedUser = User.builder()
-                .userId(user.getUserId())
+        UserSignUpParam encryptedParam = UserSignUpParam.builder()
+                .userId(userSignUpParam.getUserId())
                 .password(encryptedPassword)
-                .name(user.getName())
-                .phoneNumber(user.getPhoneNumber())
-                .email(user.getEmail())
-                .birth(user.getBirth())
+                .name(userSignUpParam.getName())
+                .phoneNumber(userSignUpParam.getPhoneNumber())
+                .email(userSignUpParam.getEmail())
+                .birth(userSignUpParam.getBirth())
                 .build();
 
-        userMapper.insertUser(encryptedUser);
+        userMapper.insertUser(encryptedParam);
     }
 
     @Override
@@ -68,15 +73,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUser(String currentUserId,
-                           UserUpdateParam userUpdateParam) {
+    public void updateUser(User currentUser,
+                           UserUpdateParam userUpdateParam,
+                           MultipartFile profileImage) {
+
+        fileService.deleteFile(currentUser.getProfileImagePath());
+
+        FileInfo fileInfo = fileService.uploadFile(profileImage);
 
         UserUpdateInfo userUpdateInfo = UserUpdateInfo.builder()
-                .userId(currentUserId)
+                .userId(currentUser.getUserId())
                 .name(userUpdateParam.getName())
                 .phoneNumber(userUpdateParam.getPhoneNumber())
                 .email(userUpdateParam.getEmail())
                 .birth(userUpdateParam.getBirth())
+                .profileMessage(userUpdateParam.getProfileMessage())
+                .profileImageName(fileInfo.getFileName())
+                .profileImagePath(fileInfo.getFilePath())
                 .build();
 
         userMapper.updateUser(userUpdateInfo);
@@ -85,39 +98,35 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updateUserPassword(User currentUser,
                                    UserPasswordUpdateParam userPasswordUpdateParam)
-            throws InValidValueException {
-
-        String currentUserId = currentUser.getUserId();
-        String currentUserPassword = currentUser.getPassword();
+            throws InvalidValueException {
 
         boolean isValidPassword = PasswordEncryptor.isMatch(
                 userPasswordUpdateParam.getExistPassword(),
-                currentUserPassword
+                currentUser.getPassword()
         );
 
         if (!isValidPassword ||
-            StringUtils.equals(userPasswordUpdateParam.getExistPassword(), userPasswordUpdateParam.getNewPassword()) ||
-            !(StringUtils.equals(userPasswordUpdateParam.getNewPassword(), userPasswordUpdateParam.getCheckNewPassword()))) {
-            throw new InValidValueException("올바르지 않은 값입니다. 다시 입력해주세요.");
+                StringUtils.equals(userPasswordUpdateParam.getExistPassword(), userPasswordUpdateParam.getNewPassword()) ||
+                !(StringUtils.equals(userPasswordUpdateParam.getNewPassword(), userPasswordUpdateParam.getCheckNewPassword()))) {
+            throw new InvalidValueException("올바르지 않은 값입니다. 다시 입력해주세요.");
         }
 
         String encryptedPassword = PasswordEncryptor.encrypt(userPasswordUpdateParam.getNewPassword());
-        UserIdAndPassword userIdAndPassword = new UserIdAndPassword(currentUserId, encryptedPassword);
+        UserIdAndPassword userIdAndPassword = new UserIdAndPassword(currentUser.getUserId(), encryptedPassword);
 
         userMapper.updateUserPassword(userIdAndPassword);
     }
 
     @Override
-    public void deleteUser(User currentUser, String inputPassword) throws InValidValueException {
-        String currentUserId = currentUser.getUserId();
-        String currentUserPassword = currentUser.getPassword();
+    public void deleteUser(User currentUser, String inputPassword) throws InvalidValueException {
 
-        boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUserPassword);
+        boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUser.getPassword());
 
         if (!isValidPassword) {
-            throw new InValidValueException();
+            throw new InvalidValueException();
         }
 
-        userMapper.deleteUser(currentUserId);
+        fileService.deleteFile(currentUser.getProfileImagePath());
+        userMapper.deleteUser(currentUser.getUserId());
     }
 }

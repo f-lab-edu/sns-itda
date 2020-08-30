@@ -3,14 +3,17 @@ package me.liiot.snsserver.model;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Date;
 
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserUpdateParam {
+public class UserSignUpParam {
+
+    private final String userId;
+
+    private final String password;
 
     private final String name;
 
@@ -19,6 +22,4 @@ public class UserUpdateParam {
     private final String email;
 
     private final Date birth;
-
-    private final String profileMessage;
 }

@@ -20,4 +20,10 @@ public class UserUpdateInfo {
     private final String email;
 
     private final Date birth;
+
+    private final String profileMessage;
+
+    private final String profileImageName;
+
+    private final String profileImagePath;
 }

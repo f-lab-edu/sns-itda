@@ -1,6 +1,6 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.InValidValueException;
+import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.sql.Date;
 
@@ -54,9 +55,18 @@ class UserServiceTest {
     @Test
     public void signUpUserTest() {
 
-        userService.signUpUser(testUser);
+        UserSignUpParam userSignUpParam = UserSignUpParam.builder()
+                .userId("test1")
+                .password("1234")
+                .name("Sally")
+                .phoneNumber("01012341234")
+                .email("test1@test.com")
+                .birth(Date.valueOf("1990-01-10"))
+                .build();
 
-        verify(userMapper).insertUser(any(User.class));
+        userService.signUpUser(userSignUpParam);
+
+        verify(userMapper).insertUser(any(UserSignUpParam.class));
     }
 
     @Test
@@ -116,11 +126,17 @@ class UserServiceTest {
     @Test
     public void updateUserTest() {
 
-        UserUpdateParam userUpdateParam = new UserUpdateParam(
-                "Sarah", "01012345678", "test1@abc.com", Date.valueOf("1990-02-20")
-        );
+        MockMultipartFile testFile = new MockMultipartFile("file", "orig", null, "bar".getBytes());
 
-        userService.updateUser(encryptedTestUser.getUserId(), userUpdateParam);
+        UserUpdateParam userUpdateParam = UserUpdateParam.builder()
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .build();
+
+        userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
 
         verify(userMapper).updateUser(any(UserUpdateInfo.class));
     }
@@ -146,7 +162,7 @@ class UserServiceTest {
                 "5678", "1234", "6789"
         );
 
-        assertThrows(InValidValueException.class, () -> {
+        assertThrows(InvalidValueException.class, () -> {
             userService.updateUserPassword(encryptedTestUser, userPasswordUpdateParam);
         });
 
@@ -166,7 +182,7 @@ class UserServiceTest {
     @Test
     public void deleteUserTestWithFail() {
 
-        assertThrows(InValidValueException.class, () -> {
+        assertThrows(InvalidValueException.class, () -> {
             userService.deleteUser(encryptedTestUser, "5678");
         });
 

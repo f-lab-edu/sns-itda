@@ -32,3 +32,6 @@ build/
 
 ### Database config ###
 db-secret.properties
+
+### Image Directory ###
+images/
