@@ -2,9 +2,12 @@ package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.FileInfo;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.UUID;
@@ -12,7 +15,8 @@ import java.util.UUID;
 @Service
 public class LocalFileService implements FileService {
 
-    private static final String BASE_DIR = "C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images";
+    @Value("${local.file.base.directory}")
+    private String BASE_DIR;
 
     @Override
     public FileInfo uploadFile(MultipartFile targetFile) throws FileUploadException {

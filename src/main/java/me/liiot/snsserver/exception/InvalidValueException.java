@@ -1,6 +1,6 @@
 package me.liiot.snsserver.exception;
 
-public class InvalidValueException extends Exception {
+public class InvalidValueException extends RuntimeException {
 
     public InvalidValueException() {
         super();

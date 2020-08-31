@@ -16,10 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.util.NestedServletException;
 
 import java.sql.Date;
@@ -66,6 +70,9 @@ class UserControllerTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
 
         encryptedTestUser = User.builder()
@@ -75,6 +82,9 @@ class UserControllerTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
 
         mockHttpSession = new MockHttpSession();
@@ -83,10 +93,19 @@ class UserControllerTest {
     @Test
     public void signUpUserTest() throws Exception {
 
+        UserSignUpParam userSignUpParam = UserSignUpParam.builder()
+                .userId("test1")
+                .password("1234")
+                .name("Sally")
+                .phoneNumber("01012341234")
+                .email("test1@test.com")
+                .birth(Date.valueOf("1990-01-10"))
+                .build();
+
         mockMvc.perform(
                 post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(testUser)))
+                        .content(mapper.writeValueAsString(userSignUpParam)))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
@@ -166,7 +185,11 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
 
-        MockMultipartFile testFile = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+        MockMultipartFile testFile = new MockMultipartFile(
+                "profileImage",
+                "profileImage",
+                "image/png",
+                "profileImage".getBytes());
 
         UserUpdateParam userUpdateParam = UserUpdateParam.builder()
                 .name("Sarah")
@@ -176,21 +199,36 @@ class UserControllerTest {
                 .profileMessage("안녕하세요")
                 .build();
 
-        mockMvc.perform(
-                put("/users/my-account")
+        // multipart로 request를 보내면 요청 방식이 "POST"로 하드코딩되어 있어 이를 임시로 "PUT"으로 변경
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/users/my-account");
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
+        mockMvc.perform(builder
+                        .file(testFile)
                         .session(mockHttpSession)
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
                         .content(mapper.writeValueAsString(userUpdateParam)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), testFile);
+        verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
     }
 
     @Test
     public void updateUserTestWithFail() throws Exception {
 
-        MockMultipartFile testFile = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+        MockMultipartFile testFile = new MockMultipartFile(
+                "profileImage",
+                "profileImage",
+                "image/png",
+                "profileImage".getBytes());
 
         UserUpdateParam userUpdateParam = UserUpdateParam.builder()
                 .name("Sarah")
@@ -200,12 +238,21 @@ class UserControllerTest {
                 .profileMessage("안녕하세요")
                 .build();
 
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/users/my-account");
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
+            }
+        });
+
         assertThrows(NullPointerException.class, () -> {
             try {
-                mockMvc.perform(
-                        put("/users/my-account")
-                                .session(mockHttpSession)
-                                .contentType(MediaType.APPLICATION_JSON)
+                mockMvc.perform(builder
+                                .file(testFile)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
                                 .content(mapper.writeValueAsString(userUpdateParam)))
                         .andDo(print());
             } catch (NestedServletException e) {

@@ -24,6 +24,9 @@ class UserServiceTest {
     @Mock
     UserMapper userMapper;
 
+    @Mock
+    FileService fileService;
+
     @InjectMocks
     UserServiceImpl userService;
 
@@ -40,6 +43,9 @@ class UserServiceTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
 
         encryptedTestUser = User.builder()
@@ -49,6 +55,9 @@ class UserServiceTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
     }
 
@@ -126,7 +135,11 @@ class UserServiceTest {
     @Test
     public void updateUserTest() {
 
-        MockMultipartFile testFile = new MockMultipartFile("file", "orig", null, "bar".getBytes());
+        MockMultipartFile testFile = new MockMultipartFile(
+                "profileImage",
+                "profileImage",
+                "image/png",
+                "profileImage".getBytes());
 
         UserUpdateParam userUpdateParam = UserUpdateParam.builder()
                 .name("Sarah")
@@ -136,8 +149,14 @@ class UserServiceTest {
                 .profileMessage("안녕하세요")
                 .build();
 
+        FileInfo fileInfo = new FileInfo("profileImage", "profileImagePath");
+
+        when(fileService.uploadFile(testFile)).thenReturn(fileInfo);
+
         userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
 
+        verify(fileService).deleteFile(encryptedTestUser.getProfileImagePath());
+        verify(fileService).uploadFile(testFile);
         verify(userMapper).updateUser(any(UserUpdateInfo.class));
     }
 
@@ -176,6 +195,7 @@ class UserServiceTest {
             userService.deleteUser(encryptedTestUser, "1234");
         });
 
+        verify(fileService).deleteFile(encryptedTestUser.getProfileImagePath());
         verify(userMapper).deleteUser(encryptedTestUser.getUserId());
     }
 
@@ -186,6 +206,7 @@ class UserServiceTest {
             userService.deleteUser(encryptedTestUser, "5678");
         });
 
+        verify(fileService, times(0)).deleteFile(encryptedTestUser.getProfileImagePath());
         verify(userMapper, times(0)).deleteUser(encryptedTestUser.getUserId());
     }
 }
