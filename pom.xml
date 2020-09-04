@@ -114,6 +114,26 @@
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
+        <!--
+        AWS Java SDK :: Services :: Amazon S3
+        : AWS S3와 통신하는데 사용되는 클라이언트 클래스를 제공하는 모듈
+        -->
+        <dependency>
+            <groupId>software.amazon.awssdk</groupId>
+            <artifactId>s3</artifactId>
+            <version>2.14.10</version>
+        </dependency>
+
+        <!--
+        commons-io
+        : 파일 관련 유틸리티 클래스, 스트림 구현, 파일 필터 등이 포함되어 있는 라이브러리
+        -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.7</version>
+        </dependency>
+
 
         <!--
         spring-boot-starter-test

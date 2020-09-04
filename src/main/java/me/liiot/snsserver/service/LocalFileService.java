@@ -3,31 +3,31 @@ package me.liiot.snsserver.service;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.FileInfo;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.UUID;
 
 @Service
+@Profile("dev")
 public class LocalFileService implements FileService {
 
     @Value("${local.file.base.directory}")
-    private String BASE_DIR;
+    private String baseDir;
 
     @Override
     public FileInfo uploadFile(MultipartFile targetFile) throws FileUploadException {
 
-        String newFileName = changeFileName();
-        StringBuilder filePathBuilder = new StringBuilder();
-        filePathBuilder.append(BASE_DIR).append("\\").append(newFileName);
+        String newFileName = changeFileName(targetFile);
+
+        StringBuilder filePath = new StringBuilder();
+        filePath.append(baseDir).append("\\").append(newFileName);
 
         try {
-            targetFile.transferTo(new File(String.valueOf(filePathBuilder)));
-            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(filePathBuilder));
+            targetFile.transferTo(new File(String.valueOf(filePath)));
+            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(filePath));
 
             return fileInfo;
         } catch (IOException e) {
@@ -41,9 +41,5 @@ public class LocalFileService implements FileService {
         if (filePath != null) {
             new File(filePath).delete();
         }
-    }
-
-    private String changeFileName() {
-        return UUID.randomUUID().toString();
     }
 }
