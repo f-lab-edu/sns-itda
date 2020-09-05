@@ -2,6 +2,7 @@ package me.liiot.snsserver.controller;
 
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
+import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.service.LoginService;
@@ -82,7 +83,8 @@ public class UserController {
                                              @CurrentUser User currentUser) {
 
         try {
-            userService.updateUser(currentUser, userUpdateParam, profileImage);
+            User updatedUser = userService.updateUser(currentUser, userUpdateParam, profileImage);
+            loginService.loginUser(updatedUser);
 
             return RESPONSE_OK;
         } catch (FileUploadException e) {
@@ -107,7 +109,7 @@ public class UserController {
 
     @DeleteMapping("/my-account")
     @CheckLogin
-    public ResponseEntity<Void> deleteUser(@RequestParam(name="password") String inputPassword,
+    public ResponseEntity<String> deleteUser(@RequestParam(name="password") String inputPassword,
                                            @CurrentUser User currentUser) {
 
         try {
@@ -115,8 +117,10 @@ public class UserController {
             loginService.logoutUser();
 
             return RESPONSE_OK;
-        } catch (InvalidValueException e) {
+        } catch (InvalidValueException ive) {
             return RESPONSE_UNAUTHORIZED;
+        } catch (FileDeleteException fde) {
+            return new ResponseEntity<>(fde.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

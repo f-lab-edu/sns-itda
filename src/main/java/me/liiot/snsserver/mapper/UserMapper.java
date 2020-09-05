@@ -19,7 +19,7 @@ public interface UserMapper {
 
     String getPassword(String userId);
 
-    User getUser(UserIdAndPassword userIdAndPassword);
+    User getUser(String UserId);
 
     void updateUser(UserUpdateInfo userUpdateInfo);
 

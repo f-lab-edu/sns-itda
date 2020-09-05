@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserIdAndPassword {
 
-    public final String userId;
+    private final String userId;
 
-    public final String password;
+    private final String password;
 }

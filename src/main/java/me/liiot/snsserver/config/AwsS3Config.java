@@ -14,7 +14,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Profile("prod")
 @PropertySource("classpath:/s3-secret.properties")
 public class AwsS3Config {
-    @Value("${aws.s3.region}")
+    @Value("${itda.aws.s3.region}")
     String region;
 
     @Value("${aws.iam.accessKeyId}")

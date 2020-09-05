@@ -1,10 +1,12 @@
 package me.liiot.snsserver.service;
 
+import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.FileInfo;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -14,16 +16,24 @@ import java.io.IOException;
 @Profile("dev")
 public class LocalFileService implements FileService {
 
-    @Value("${local.file.base.directory}")
+    private static final String WINDOWS_SEPARATOR = "\\";
+
+    @Value("${itda.local.file.base.directory}")
     private String baseDir;
 
     @Override
-    public FileInfo uploadFile(MultipartFile targetFile) throws FileUploadException {
+    public FileInfo uploadFile(MultipartFile targetFile, String userId) throws FileUploadException {
 
         String newFileName = changeFileName(targetFile);
 
-        StringBuilder filePath = new StringBuilder();
-        filePath.append(baseDir).append("\\").append(newFileName);
+        checkDirectory(userId);
+
+        StringBuilder filePath = new StringBuilder()
+                .append(baseDir)
+                .append(WINDOWS_SEPARATOR)
+                .append(userId)
+                .append(WINDOWS_SEPARATOR)
+                .append(newFileName);
 
         try {
             targetFile.transferTo(new File(String.valueOf(filePath)));
@@ -31,7 +41,7 @@ public class LocalFileService implements FileService {
 
             return fileInfo;
         } catch (IOException e) {
-            throw new FileUploadException("파일 업로드에 실패하였습니다.");
+            throw new FileUploadException("파일을 업로드하는데 실패하였습니다.");
         }
     }
 
@@ -40,6 +50,34 @@ public class LocalFileService implements FileService {
 
         if (filePath != null) {
             new File(filePath).delete();
+        }
+    }
+
+    @Override
+    public void deleteDirectory(String userId) {
+
+        StringBuilder directoryPath = new StringBuilder()
+                .append(baseDir)
+                .append(WINDOWS_SEPARATOR)
+                .append(userId);
+
+        boolean isSuccess = FileSystemUtils.deleteRecursively(new File(String.valueOf(directoryPath)));
+
+        if (!isSuccess) {
+            throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.");
+        }
+    }
+
+    private void checkDirectory(String userId) {
+        StringBuilder dirPath = new StringBuilder()
+                .append(baseDir)
+                .append(WINDOWS_SEPARATOR)
+                .append(userId);
+
+        File directory = new File(String.valueOf(dirPath));
+
+        if (!directory.exists()) {
+            directory.mkdir();
         }
     }
 }

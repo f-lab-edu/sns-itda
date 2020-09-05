@@ -199,6 +199,20 @@ class UserControllerTest {
                 .profileMessage("안녕하세요")
                 .build();
 
+        User updatedTestUser = User.builder()
+                .userId("test1")
+                .password(PasswordEncryptor.encrypt("1234"))
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .profileImageName("profileImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage")
+                .build();
+
+        when(userService.updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile))).thenReturn(updatedTestUser);
+
         // multipart로 request를 보내면 요청 방식이 "POST"로 하드코딩되어 있어 이를 임시로 "PUT"으로 변경
         MockMultipartHttpServletRequestBuilder builder =
                 MockMvcRequestBuilders.multipart("/users/my-account");
@@ -219,48 +233,7 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
-    }
-
-    @Test
-    public void updateUserTestWithFail() throws Exception {
-
-        MockMultipartFile testFile = new MockMultipartFile(
-                "profileImage",
-                "profileImage",
-                "image/png",
-                "profileImage".getBytes());
-
-        UserUpdateParam userUpdateParam = UserUpdateParam.builder()
-                .name("Sarah")
-                .phoneNumber("01012345678")
-                .email("test1@abc.com")
-                .birth(Date.valueOf("1990-02-20"))
-                .profileMessage("안녕하세요")
-                .build();
-
-        MockMultipartHttpServletRequestBuilder builder =
-                MockMvcRequestBuilders.multipart("/users/my-account");
-        builder.with(new RequestPostProcessor() {
-            @Override
-            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
-                request.setMethod("PUT");
-                return request;
-            }
-        });
-
-        assertThrows(NullPointerException.class, () -> {
-            try {
-                mockMvc.perform(builder
-                                .file(testFile)
-                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
-                                .content(mapper.writeValueAsString(userUpdateParam)))
-                        .andDo(print());
-            } catch (NestedServletException e) {
-                throw e.getCause();
-            }
-        });
-
-        verify(userService, times(0)).updateUser(any(User.class), any(UserUpdateParam.class), testFile);
+        verify(loginService).loginUser(updatedTestUser);
     }
 
     @Test

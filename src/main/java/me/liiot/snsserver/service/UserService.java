@@ -12,7 +12,7 @@ public interface UserService {
 
     public User getLoginUser(UserIdAndPassword userIdAndPassword);
 
-    public void updateUser(User user, UserUpdateParam userUpdateParam, MultipartFile profileImage);
+    public User updateUser(User user, UserUpdateParam userUpdateParam, MultipartFile profileImage);
 
     public void updateUserPassword(User user, UserPasswordUpdateParam userPasswordUpdateParam)
             throws InvalidValueException;

@@ -21,16 +21,21 @@ import java.nio.ByteBuffer;
 @Profile("prod")
 public class AwsFileService implements FileService {
 
-    @Value("${aws.s3.bucket.name}")
+    @Value("${itda.aws.s3.base.url}")
+    String baseUrl;
+
+    @Value("${itda.aws.s3.bucket.name}")
     String bucket;
 
     @Autowired
     S3Client s3Client;
 
     @Override
-    public FileInfo uploadFile(MultipartFile file) throws FileUploadException {
+    public FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException {
 
-        String key = changeFileName(file);
+        String newFileName = changeFileName(file);
+        StringBuilder key = new StringBuilder();
+        key.append(userId).append("/").append(newFileName);
 
         try {
             byte[] attachment = file.getBytes();
@@ -48,7 +53,7 @@ public class AwsFileService implements FileService {
                             .build()
                     );
 
-            FileInfo fileInfo = new FileInfo(key, String.valueOf(reportUrl));
+            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(reportUrl));
 
             return fileInfo;
         } catch (SdkServiceException | SdkClientException | IOException e) {
@@ -58,9 +63,21 @@ public class AwsFileService implements FileService {
 
     @Override
     public void deleteFile(String filePath) {
+        if (filePath != null) {
+            String key = filePath.substring(baseUrl.length());
+
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .build());
+        }
+    }
+
+    @Override
+    public void deleteDirectory(String userId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(bucket)
-                .key(filePath)
+                .key("test1")
                 .build());
     }
 }

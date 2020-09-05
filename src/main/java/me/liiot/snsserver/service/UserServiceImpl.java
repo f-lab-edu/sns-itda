@@ -68,18 +68,18 @@ public class UserServiceImpl implements UserService {
             return null;
         }
 
-        User user = userMapper.getUser(userIdAndPassword);
+        User user = userMapper.getUser(userIdAndPassword.getUserId());
         return user;
     }
 
     @Override
-    public void updateUser(User currentUser,
+    public User updateUser(User currentUser,
                            UserUpdateParam userUpdateParam,
                            MultipartFile profileImage) {
 
         fileService.deleteFile(currentUser.getProfileImagePath());
 
-        FileInfo fileInfo = fileService.uploadFile(profileImage);
+        FileInfo fileInfo = fileService.uploadFile(profileImage, currentUser.getUserId());
 
         UserUpdateInfo userUpdateInfo = UserUpdateInfo.builder()
                 .userId(currentUser.getUserId())
@@ -93,6 +93,9 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         userMapper.updateUser(userUpdateInfo);
+        User updatedUser = userMapper.getUser(currentUser.getUserId());
+
+        return updatedUser;
     }
 
     @Override
@@ -126,7 +129,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidValueException();
         }
 
-        fileService.deleteFile(currentUser.getProfileImagePath());
+        fileService.deleteDirectory(currentUser.getUserId());
         userMapper.deleteUser(currentUser.getUserId());
     }
 }

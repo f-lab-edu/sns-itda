@@ -11,9 +11,11 @@ import static org.apache.commons.io.FilenameUtils.EXTENSION_SEPARATOR_STR;
 
 public interface FileService {
 
-    FileInfo uploadFile(MultipartFile file) throws FileUploadException;
+    FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException;
 
     void deleteFile(String filePath);
+
+    void deleteDirectory(String userId);
 
     default String changeFileName(MultipartFile file) {
         String uuid =  UUID.randomUUID().toString();
