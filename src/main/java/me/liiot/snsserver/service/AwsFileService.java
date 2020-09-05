@@ -77,7 +77,7 @@ public class AwsFileService implements FileService {
     public void deleteDirectory(String userId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(bucket)
-                .key("test1")
+                .key(userId)
                 .build());
     }
 }
