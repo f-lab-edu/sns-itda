@@ -16,8 +16,6 @@ import java.io.IOException;
 @Profile("dev")
 public class LocalFileService implements FileService {
 
-    private static final String WINDOWS_SEPARATOR = "\\";
-
     @Value("${itda.local.file.base.directory}")
     private String baseDir;
 
@@ -30,9 +28,9 @@ public class LocalFileService implements FileService {
 
         StringBuilder filePath = new StringBuilder()
                 .append(baseDir)
-                .append(WINDOWS_SEPARATOR)
+                .append(File.separator)
                 .append(userId)
-                .append(WINDOWS_SEPARATOR)
+                .append(File.separator)
                 .append(newFileName);
 
         try {
@@ -41,7 +39,7 @@ public class LocalFileService implements FileService {
 
             return fileInfo;
         } catch (IOException e) {
-            throw new FileUploadException("파일을 업로드하는데 실패하였습니다.");
+            throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
         }
     }
 
@@ -56,12 +54,12 @@ public class LocalFileService implements FileService {
     @Override
     public void deleteDirectory(String userId) {
 
-        StringBuilder directoryPath = new StringBuilder()
+        StringBuilder dirPath = new StringBuilder()
                 .append(baseDir)
-                .append(WINDOWS_SEPARATOR)
+                .append(File.separator)
                 .append(userId);
 
-        boolean isSuccess = FileSystemUtils.deleteRecursively(new File(String.valueOf(directoryPath)));
+        boolean isSuccess = FileSystemUtils.deleteRecursively(new File(String.valueOf(dirPath)));
 
         if (!isSuccess) {
             throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.");
@@ -69,9 +67,10 @@ public class LocalFileService implements FileService {
     }
 
     private void checkDirectory(String userId) {
+
         StringBuilder dirPath = new StringBuilder()
                 .append(baseDir)
-                .append(WINDOWS_SEPARATOR)
+                .append(File.separator)
                 .append(userId);
 
         File directory = new File(String.valueOf(dirPath));

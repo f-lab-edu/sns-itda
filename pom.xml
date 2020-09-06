@@ -124,16 +124,6 @@
             <version>2.14.10</version>
         </dependency>
 
-        <!--
-        commons-io
-        : 파일 관련 유틸리티 클래스, 스트림 구현, 파일 필터 등이 포함되어 있는 라이브러리
-        -->
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.7</version>
-        </dependency>
-
 
         <!--
         spring-boot-starter-test
