@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /*
@@ -19,7 +20,7 @@ import java.sql.Date;
 @Getter
 @Builder
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
 
     private final String userId;
 
