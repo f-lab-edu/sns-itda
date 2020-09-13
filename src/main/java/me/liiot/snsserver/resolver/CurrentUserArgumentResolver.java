@@ -1,7 +1,7 @@
 package me.liiot.snsserver.resolver;
 
 import me.liiot.snsserver.annotation.CurrentUser;
-import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.util.SessionKeys;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;

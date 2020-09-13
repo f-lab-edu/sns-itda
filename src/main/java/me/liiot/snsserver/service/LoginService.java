@@ -1,6 +1,6 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.user.User;
 
 public interface LoginService {
 

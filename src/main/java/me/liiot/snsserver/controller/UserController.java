@@ -4,7 +4,7 @@ import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
-import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import static me.liiot.snsserver.util.HttpResponses.*;
 
 /*
 @RestController
@@ -27,16 +29,15 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/users")
 public class UserController {
 
-    private static final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
-    private static final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
-    private static final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
-    private static final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
-
-    @Autowired
     private UserService userService;
 
-    @Autowired
     private LoginService loginService;
+
+    @Autowired
+    public UserController(UserService userService, LoginService loginService) {
+        this.userService = userService;
+        this.loginService = loginService;
+    }
 
     @PostMapping
     public ResponseEntity<Void> signUpUser(UserSignUpParam userSignUpParam) {

@@ -1,10 +1,10 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

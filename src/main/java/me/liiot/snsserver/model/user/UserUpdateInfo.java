@@ -1,4 +1,4 @@
-package me.liiot.snsserver.model;
+package me.liiot.snsserver.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,11 +9,9 @@ import java.sql.Date;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserSignUpParam {
+public class UserUpdateInfo {
 
     private final String userId;
-
-    private final String password;
 
     private final String name;
 
@@ -22,4 +20,10 @@ public class UserSignUpParam {
     private final String email;
 
     private final Date birth;
+
+    private final String profileMessage;
+
+    private final String profileImageName;
+
+    private final String profileImagePath;
 }

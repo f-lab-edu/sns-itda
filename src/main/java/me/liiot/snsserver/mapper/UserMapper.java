@@ -1,9 +1,9 @@
 package me.liiot.snsserver.mapper;
 
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserIdAndPassword;
-import me.liiot.snsserver.model.UserSignUpParam;
-import me.liiot.snsserver.model.UserUpdateInfo;
+import me.liiot.snsserver.model.user.User;
+import me.liiot.snsserver.model.user.UserIdAndPassword;
+import me.liiot.snsserver.model.user.UserSignUpParam;
+import me.liiot.snsserver.model.user.UserUpdateInfo;
 import org.apache.ibatis.annotations.Mapper;
 
 /*

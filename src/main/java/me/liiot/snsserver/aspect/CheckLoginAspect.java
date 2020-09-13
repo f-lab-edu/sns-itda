@@ -1,6 +1,6 @@
 package me.liiot.snsserver.aspect;
 
-import me.liiot.snsserver.model.User;
+import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.util.SessionKeys;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;

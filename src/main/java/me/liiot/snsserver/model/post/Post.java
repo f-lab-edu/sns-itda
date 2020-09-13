@@ -1,17 +1,13 @@
-package me.liiot.snsserver.model;
+package me.liiot.snsserver.model.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.sql.Date;
-
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserUpdateInfo {
-
-    private final String userId;
+public class Post {
 
     private final String name;
 
@@ -19,11 +15,5 @@ public class UserUpdateInfo {
 
     private final String email;
 
-    private final Date birth;
-
     private final String profileMessage;
-
-    private final String profileImageName;
-
-    private final String profileImagePath;
 }

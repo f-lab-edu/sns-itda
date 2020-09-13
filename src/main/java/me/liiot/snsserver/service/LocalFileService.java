@@ -11,6 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 @Profile("dev")
@@ -20,7 +23,8 @@ public class LocalFileService implements FileService {
     private String baseDir;
 
     @Override
-    public FileInfo uploadFile(MultipartFile targetFile, String userId) throws FileUploadException {
+    public FileInfo uploadFile(MultipartFile targetFile,
+                               String userId) throws FileUploadException {
 
         String newFileName = changeFileName(targetFile);
 
@@ -41,6 +45,36 @@ public class LocalFileService implements FileService {
         } catch (IOException e) {
             throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
         }
+    }
+
+    @Override
+    public List<FileInfo> uploadFiles(List<MultipartFile> targetFiles,
+                                      String userId) throws FileUploadException {
+
+        List<FileInfo> fileInfos = new ArrayList<>();
+        HashMap<String, String> newFileNames = changeFileNames(targetFiles);
+
+        checkDirectory(userId);
+
+        for (MultipartFile targetFile : targetFiles) {
+            StringBuilder filePath = new StringBuilder()
+                    .append(baseDir)
+                    .append(File.separator)
+                    .append(userId)
+                    .append(File.separator)
+                    .append(newFileNames.get(targetFile.getOriginalFilename()));
+
+            try {
+                targetFile.transferTo(new File(String.valueOf(filePath)));
+                FileInfo fileInfo = new FileInfo(newFileNames.get(targetFile.getOriginalFilename()),
+                        String.valueOf(filePath));
+
+                fileInfos.add(fileInfo);
+            } catch (IOException e) {
+                throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
+            }
+        }
+        return fileInfos;
     }
 
     @Override

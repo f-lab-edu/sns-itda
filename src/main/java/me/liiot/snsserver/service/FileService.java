@@ -5,11 +5,15 @@ import me.liiot.snsserver.model.FileInfo;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
 public interface FileService {
 
     FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException;
+
+    List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException;
 
     void deleteFile(String filePath);
 
@@ -28,5 +32,21 @@ public interface FileService {
         newFileName.append(uuid).append(".").append(extension);
 
         return String.valueOf(newFileName);
+    }
+
+    default HashMap<String, String> changeFileNames(List<MultipartFile> files) {
+
+        HashMap<String, String> newFileNames = new HashMap<>();
+
+        for (MultipartFile file : files) {
+            String uuid = UUID.randomUUID().toString();
+            String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+
+            StringBuilder newFileName = new StringBuilder();
+            newFileName.append(uuid).append(".").append(extension);
+
+            newFileNames.put(file.getOriginalFilename(), String.valueOf(newFileName));
+        }
+        return newFileNames;
     }
 }

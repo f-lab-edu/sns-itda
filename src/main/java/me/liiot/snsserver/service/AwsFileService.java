@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -66,6 +67,44 @@ public class AwsFileService implements FileService {
         } catch (SdkServiceException | SdkClientException | IOException e) {
             throw new FileUploadException("파일 업로드에 실패했습니다.", e);
         }
+    }
+
+    @Override
+    public List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException {
+
+        List<FileInfo> fileInfos = new ArrayList<>();
+        HashMap<String, String> newFileNames = changeFileNames(files);
+
+        int filesLen = files.size();
+        for (int i=0; i<filesLen; i++) {
+
+            String newFileName = newFileNames.get(files.get(i).getOriginalFilename());
+            StringBuilder key = new StringBuilder();
+            key.append(userId).append("/").append(newFileName);
+
+            try {
+                byte[] attachment = files.get(i).getBytes();
+                s3Client.putObject(
+                        PutObjectRequest.builder()
+                                .bucket(bucket)
+                                .key(String.valueOf(key))
+                                .build(),
+                        RequestBody.fromByteBuffer(ByteBuffer.wrap(attachment)));
+
+                URL reportUrl = s3Client.utilities()
+                        .getUrl(GetUrlRequest.builder()
+                                .bucket(bucket)
+                                .key(String.valueOf(key))
+                                .build()
+                        );
+
+                FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(reportUrl));
+                fileInfos.add(fileInfo);
+            } catch (SdkServiceException | SdkClientException | IOException e) {
+                throw new FileUploadException("파일 업로드에 실패했습니다.", e);
+            }
+        }
+        return fileInfos;
     }
 
     @Override

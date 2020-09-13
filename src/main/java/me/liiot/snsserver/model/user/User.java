@@ -1,4 +1,4 @@
-package me.liiot.snsserver.model;
+package me.liiot.snsserver.model.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
