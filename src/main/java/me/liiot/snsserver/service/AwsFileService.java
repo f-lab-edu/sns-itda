@@ -3,6 +3,7 @@ package me.liiot.snsserver.service;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.util.FileNameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -41,7 +42,7 @@ public class AwsFileService implements FileService {
     @Override
     public FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException {
 
-        String newFileName = changeFileName(file);
+        String newFileName = FileNameUtil.changeFileName(file);
         StringBuilder key = new StringBuilder();
         key.append(userId).append("/").append(newFileName);
 
@@ -73,7 +74,7 @@ public class AwsFileService implements FileService {
     public List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException {
 
         List<FileInfo> fileInfos = new ArrayList<>();
-        HashMap<String, String> newFileNames = changeFileNames(files);
+        HashMap<String, String> newFileNames = FileNameUtil.changeFileNames(files);
 
         int filesLen = files.size();
         for (int i=0; i<filesLen; i++) {

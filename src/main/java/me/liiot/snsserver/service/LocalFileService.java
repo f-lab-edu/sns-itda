@@ -3,6 +3,7 @@ package me.liiot.snsserver.service;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.util.FileNameUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class LocalFileService implements FileService {
     public FileInfo uploadFile(MultipartFile targetFile,
                                String userId) throws FileUploadException {
 
-        String newFileName = changeFileName(targetFile);
+        String newFileName = FileNameUtil.changeFileName(targetFile);
 
         checkDirectory(userId);
 
@@ -52,7 +53,7 @@ public class LocalFileService implements FileService {
                                       String userId) throws FileUploadException {
 
         List<FileInfo> fileInfos = new ArrayList<>();
-        HashMap<String, String> newFileNames = changeFileNames(targetFiles);
+        HashMap<String, String> newFileNames = FileNameUtil.changeFileNames(targetFiles);
 
         checkDirectory(userId);
 

@@ -1,6 +1,8 @@
 package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.model.user.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.util.SessionKeys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,14 @@ public class SessionLoginService implements LoginService {
 
     @Override
     public void loginUser(User user) {
-        httpSession.setAttribute(SessionKeys.USER, user);
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String jsonStr = mapper.writeValueAsString(user);
+            httpSession.setAttribute(SessionKeys.USER, jsonStr);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("로그인을 하는 과정에서 에러가 발생하였습니다.", e);
+        }
     }
 
     @Override

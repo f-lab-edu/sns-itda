@@ -36,5 +36,8 @@ db-secret.properties
 ### AWS S3 config ###
 s3-secret.properties
 
+### Lombok config ###
+lombok.config
+
 ### Image Directory ###
 images/
