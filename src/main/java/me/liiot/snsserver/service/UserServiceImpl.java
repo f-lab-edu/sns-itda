@@ -1,6 +1,5 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;

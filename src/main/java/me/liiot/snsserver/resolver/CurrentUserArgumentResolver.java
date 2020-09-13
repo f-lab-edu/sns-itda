@@ -1,5 +1,6 @@
 package me.liiot.snsserver.resolver;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.util.SessionKeys;
@@ -24,6 +25,11 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         HttpServletRequest servletRequest = (HttpServletRequest) nativeWebRequest.getNativeRequest();
         HttpSession httpSession = servletRequest.getSession();
 
-        return (User)httpSession.getAttribute(SessionKeys.USER);
+        ObjectMapper mapper = new ObjectMapper();
+
+        String jsonStr = (String)httpSession.getAttribute(SessionKeys.USER);
+        User user = mapper.readValue(jsonStr, User.class);
+
+        return user;
     }
 }
