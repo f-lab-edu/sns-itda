@@ -7,27 +7,9 @@
         VALUES(#{userId}, #{content})
     </insert>
 
-    <select id="getPostId" parameterType="String" resultType="int">
+    <select id="getLatestPostId" parameterType="String" resultType="int">
         SELECT id FROM post
         WHERE userId = #{userId}
         ORDER BY createTime DESC LIMIT 1
     </select>
-
-    <insert id="insertImage" parameterType="me.liiot.snsserver.model.post.PostImageUploadInfo">
-        INSERT INTO image(postId, imageName, imagePath, seq)
-        VALUES(#{postId}, #{imageName}, #{imagePath}, #{seq})
-    </insert>
-
-    <insert id="insertImages" parameterType="java.util.List">
-        INSERT INTO image(postId, imageName, imagePath, seq)
-        VALUES
-        <foreach collection="imageUploadInfos" item="info" separator=",">
-            (
-            #{info.postId},
-            #{info.imageName},
-            #{info.imagePath},
-            #{info.seq}
-            )
-        </foreach>
-    </insert>
 </mapper>

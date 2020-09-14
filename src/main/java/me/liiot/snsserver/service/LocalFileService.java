@@ -1,8 +1,11 @@
 package me.liiot.snsserver.service;
 
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
+import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.model.post.ImageUploadInfo;
 import me.liiot.snsserver.util.FileNameUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -17,11 +20,14 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Profile("dev")
 public class LocalFileService implements FileService {
 
     @Value("${itda.local.file.base.directory}")
     private String baseDir;
+
+    private final FileMapper fileMapper;
 
     @Override
     public FileInfo uploadFile(MultipartFile targetFile,
@@ -76,6 +82,34 @@ public class LocalFileService implements FileService {
             }
         }
         return fileInfos;
+    }
+
+    @Override
+    public void uploadImage(int postId, FileInfo fileInfo) {
+        ImageUploadInfo imageUploadInfo =
+                new ImageUploadInfo(
+                        postId,
+                        fileInfo.getFileName(),
+                        fileInfo.getFilePath(), 1);
+
+        fileMapper.insertImage(imageUploadInfo);
+    }
+
+    @Override
+    public void uploadImages(int postId, List<FileInfo> fileInfos) {
+        List<ImageUploadInfo> imageUploadInfos = new ArrayList<>();
+        int fileInfosLen = fileInfos.size();
+        for (int i=0; i<fileInfosLen; i++) {
+            ImageUploadInfo imageUploadInfo =
+                    new ImageUploadInfo(
+                            postId,
+                            fileInfos.get(i).getFileName(),
+                            fileInfos.get(i).getFilePath(),
+                            i+1);
+            imageUploadInfos.add(imageUploadInfo);
+        }
+
+        fileMapper.insertImages(imageUploadInfos);
     }
 
     @Override

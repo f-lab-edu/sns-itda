@@ -1,5 +1,6 @@
 package me.liiot.snsserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.exception.FileDeleteException;
@@ -9,7 +10,6 @@ import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,18 +26,13 @@ import static me.liiot.snsserver.util.HttpResponses.*;
 : 요청 URL과 해당 URL을 처리할 클래스나 메소드에 연결
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private UserService userService;
+    private final UserService userService;
 
-    private LoginService loginService;
-
-    @Autowired
-    public UserController(UserService userService, LoginService loginService) {
-        this.userService = userService;
-        this.loginService = loginService;
-    }
+    private final LoginService loginService;
 
     @PostMapping
     public ResponseEntity<Void> signUpUser(UserSignUpParam userSignUpParam) {
