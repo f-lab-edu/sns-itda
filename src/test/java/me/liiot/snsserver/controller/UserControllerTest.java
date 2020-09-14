@@ -1,12 +1,9 @@
 package me.liiot.snsserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import me.liiot.snsserver.exception.InValidValueException;
+import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.model.UserIdAndPassword;
-import me.liiot.snsserver.model.UserPasswordUpdateParam;
-import me.liiot.snsserver.model.UserUpdateParam;
+import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.PasswordEncryptor;
@@ -19,9 +16,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.util.NestedServletException;
 
 import java.sql.Date;
@@ -68,6 +70,9 @@ class UserControllerTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
 
         encryptedTestUser = User.builder()
@@ -77,6 +82,9 @@ class UserControllerTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\testImage")
                 .build();
 
         mockHttpSession = new MockHttpSession();
@@ -85,14 +93,23 @@ class UserControllerTest {
     @Test
     public void signUpUserTest() throws Exception {
 
+        UserSignUpParam userSignUpParam = UserSignUpParam.builder()
+                .userId("test1")
+                .password("1234")
+                .name("Sally")
+                .phoneNumber("01012341234")
+                .email("test1@test.com")
+                .birth(Date.valueOf("1990-01-10"))
+                .build();
+
         mockMvc.perform(
-                    post("/users")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(testUser)))
+                post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(userSignUpParam)))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        verify(userService).signUpUser(any(User.class));
+        verify(userService).signUpUser(any(UserSignUpParam.class));
     }
 
     @Test
@@ -125,9 +142,9 @@ class UserControllerTest {
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(encryptedTestUser);
 
         mockMvc.perform(
-                    post("/users/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(userIdAndPassword)))
+                post("/users/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(userIdAndPassword)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -168,42 +185,55 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
 
-        UserUpdateParam userUpdateParam = new UserUpdateParam(
-                "Sarah", "01012345678", "test1@abc.com", Date.valueOf("1990-02-20")
-        );
+        MockMultipartFile testFile = new MockMultipartFile(
+                "profileImage",
+                "profileImage",
+                "image/png",
+                "profileImage".getBytes());
 
-        mockMvc.perform(
-                    put("/users/my-account")
-                    .session(mockHttpSession)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(userUpdateParam)))
-                .andDo(print())
-                .andExpect(status().isOk());
+        UserUpdateParam userUpdateParam = UserUpdateParam.builder()
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .build();
 
-        verify(userService).updateUser(eq(encryptedTestUser.getUserId()), any(UserUpdateParam.class));
-    }
+        User updatedTestUser = User.builder()
+                .userId("test1")
+                .password(PasswordEncryptor.encrypt("1234"))
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .profileImageName("profileImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage")
+                .build();
 
-    @Test
-    public void updateUserTestWithFail() throws Exception {
+        when(userService.updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile))).thenReturn(updatedTestUser);
 
-        UserUpdateParam userUpdateParam = new UserUpdateParam(
-                "Sarah", "01012345678", "test1@abc.com", Date.valueOf("1990-02-20")
-        );
-
-        assertThrows(NullPointerException.class, () -> {
-            try {
-                mockMvc.perform(
-                            put("/users/my-account")
-                            .session(mockHttpSession)
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(mapper.writeValueAsString(userUpdateParam)))
-                        .andDo(print());
-            } catch (NestedServletException e) {
-                throw e.getCause();
+        // multipart로 request를 보내면 요청 방식이 "POST"로 하드코딩되어 있어 이를 임시로 "PUT"으로 변경
+        MockMultipartHttpServletRequestBuilder builder =
+                MockMvcRequestBuilders.multipart("/users/my-account");
+        builder.with(new RequestPostProcessor() {
+            @Override
+            public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                request.setMethod("PUT");
+                return request;
             }
         });
 
-        verify(userService, times(0)).updateUser(anyString(), any(UserUpdateParam.class));
+        mockMvc.perform(builder
+                        .file(testFile)
+                        .session(mockHttpSession)
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .content(mapper.writeValueAsString(userUpdateParam)))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
+        verify(loginService).loginUser(updatedTestUser);
     }
 
     @Test
@@ -215,10 +245,10 @@ class UserControllerTest {
                 "1234", "5678", "5678");
 
         mockMvc.perform(
-                    put("/users/my-account/password")
-                    .session(mockHttpSession)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(passwordUpdateParam)))
+                put("/users/my-account/password")
+                        .session(mockHttpSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(passwordUpdateParam)))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -234,15 +264,15 @@ class UserControllerTest {
         UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
                 "5678", "1234", "6789");
 
-        doThrow(InValidValueException.class)
+        doThrow(InvalidValueException.class)
                 .when(userService)
                 .updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
 
         mockMvc.perform(
-                    put("/users/my-account/password")
-                    .session(mockHttpSession)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(mapper.writeValueAsString(passwordUpdateParam)))
+                put("/users/my-account/password")
+                        .session(mockHttpSession)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(passwordUpdateParam)))
                 .andDo(print())
                 .andExpect(status().isConflict());
 
@@ -256,9 +286,9 @@ class UserControllerTest {
         mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
 
         mockMvc.perform(
-                    delete("/users/my-account")
-                    .session(mockHttpSession)
-                    .param("password", "1234"))
+                delete("/users/my-account")
+                        .session(mockHttpSession)
+                        .param("password", "1234"))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -271,7 +301,7 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
 
-        doThrow(InValidValueException.class).when(userService).deleteUser(eq(encryptedTestUser), anyString());
+        doThrow(InvalidValueException.class).when(userService).deleteUser(eq(encryptedTestUser), anyString());
 
         mockMvc.perform(
                 delete("/users/my-account")

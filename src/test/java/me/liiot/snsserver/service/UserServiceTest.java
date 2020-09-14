@@ -1,6 +1,6 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.InValidValueException;
+import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.sql.Date;
 
@@ -22,6 +23,9 @@ class UserServiceTest {
 
     @Mock
     UserMapper userMapper;
+
+    @Mock
+    FileService fileService;
 
     @InjectMocks
     UserServiceImpl userService;
@@ -39,6 +43,9 @@ class UserServiceTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\testImage")
                 .build();
 
         encryptedTestUser = User.builder()
@@ -48,15 +55,27 @@ class UserServiceTest {
                 .phoneNumber("01012341234")
                 .email("test1@test.com")
                 .birth(Date.valueOf("1990-01-10"))
+                .profileMessage("안녕!")
+                .profileImageName("testImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\testImage")
                 .build();
     }
 
     @Test
     public void signUpUserTest() {
 
-        userService.signUpUser(testUser);
+        UserSignUpParam userSignUpParam = UserSignUpParam.builder()
+                .userId("test1")
+                .password("1234")
+                .name("Sally")
+                .phoneNumber("01012341234")
+                .email("test1@test.com")
+                .birth(Date.valueOf("1990-01-10"))
+                .build();
 
-        verify(userMapper).insertUser(any(User.class));
+        userService.signUpUser(userSignUpParam);
+
+        verify(userMapper).insertUser(any(UserSignUpParam.class));
     }
 
     @Test
@@ -88,13 +107,13 @@ class UserServiceTest {
 
         UserIdAndPassword userIdAndPassword = new UserIdAndPassword(testUser.getUserId(), testUser.getPassword());
 
-        when(userMapper.getPassword(userIdAndPassword.userId)).thenReturn(encryptedTestUser.getPassword());
-        when(userMapper.getUser(userIdAndPassword)).thenReturn(encryptedTestUser);
+        when(userMapper.getPassword(userIdAndPassword.getUserId())).thenReturn(encryptedTestUser.getPassword());
+        when(userMapper.getUser(userIdAndPassword.getUserId())).thenReturn(encryptedTestUser);
 
         User loginUser = userService.getLoginUser(userIdAndPassword);
 
         verify(userMapper).getPassword("test1");
-        verify(userMapper).getUser(userIdAndPassword);
+        verify(userMapper).getUser("test1");
 
         assertEquals(encryptedTestUser, loginUser);
     }
@@ -104,25 +123,57 @@ class UserServiceTest {
 
         UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test2", "5678");
 
-        when(userMapper.getPassword(userIdAndPassword.userId)).thenReturn(null);
+        when(userMapper.getPassword(userIdAndPassword.getUserId())).thenReturn(null);
 
         User loginUser = userService.getLoginUser(userIdAndPassword);
         assertEquals(null, loginUser);
 
         verify(userMapper).getPassword("test2");
-        verify(userMapper, times(0)).getUser(userIdAndPassword);
+        verify(userMapper, times(0)).getUser("test2");
     }
 
     @Test
     public void updateUserTest() {
 
-        UserUpdateParam userUpdateParam = new UserUpdateParam(
-                "Sarah", "01012345678", "test1@abc.com", Date.valueOf("1990-02-20")
-        );
+        MockMultipartFile testFile = new MockMultipartFile(
+                "profileImage",
+                "profileImage",
+                "image/png",
+                "profileImage".getBytes());
 
-        userService.updateUser(encryptedTestUser.getUserId(), userUpdateParam);
+        UserUpdateParam userUpdateParam = UserUpdateParam.builder()
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .build();
 
+        User updatedTestUser = User.builder()
+                .userId("test1")
+                .password(PasswordEncryptor.encrypt("1234"))
+                .name("Sarah")
+                .phoneNumber("01012345678")
+                .email("test1@abc.com")
+                .birth(Date.valueOf("1990-02-20"))
+                .profileMessage("안녕하세요")
+                .profileImageName("profileImage")
+                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage")
+                .build();
+
+        FileInfo fileInfo = new FileInfo("profileImage", "C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage");
+
+        when(fileService.uploadFile(testFile, encryptedTestUser.getUserId())).thenReturn(fileInfo);
+        when(userMapper.getUser(encryptedTestUser.getUserId())).thenReturn(updatedTestUser);
+
+        User user = userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
+
+        verify(fileService).deleteFile(encryptedTestUser.getProfileImagePath());
+        verify(fileService).uploadFile(testFile, encryptedTestUser.getUserId());
         verify(userMapper).updateUser(any(UserUpdateInfo.class));
+        verify(userMapper).getUser("test1");
+
+        assertEquals(true, user.equals(updatedTestUser));
     }
 
     @Test
@@ -146,7 +197,7 @@ class UserServiceTest {
                 "5678", "1234", "6789"
         );
 
-        assertThrows(InValidValueException.class, () -> {
+        assertThrows(InvalidValueException.class, () -> {
             userService.updateUserPassword(encryptedTestUser, userPasswordUpdateParam);
         });
 
@@ -160,16 +211,18 @@ class UserServiceTest {
             userService.deleteUser(encryptedTestUser, "1234");
         });
 
+        verify(fileService).deleteDirectory(encryptedTestUser.getUserId());
         verify(userMapper).deleteUser(encryptedTestUser.getUserId());
     }
 
     @Test
     public void deleteUserTestWithFail() {
 
-        assertThrows(InValidValueException.class, () -> {
+        assertThrows(InvalidValueException.class, () -> {
             userService.deleteUser(encryptedTestUser, "5678");
         });
 
+        verify(fileService, times(0)).deleteDirectory(encryptedTestUser.getUserId());
         verify(userMapper, times(0)).deleteUser(encryptedTestUser.getUserId());
     }
 }

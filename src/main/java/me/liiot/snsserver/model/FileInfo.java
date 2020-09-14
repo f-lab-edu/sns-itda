@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class UserIdAndPassword {
+public class FileInfo {
 
-    private final String userId;
+    private final String fileName;
 
-    private final String password;
+    private final String filePath;
 }
