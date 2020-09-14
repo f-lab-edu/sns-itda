@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class PostImageUploadInfo {
+public class ImageUploadInfo {
 
     private int postId;
 

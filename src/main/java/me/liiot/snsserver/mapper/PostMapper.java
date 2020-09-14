@@ -1,9 +1,7 @@
 package me.liiot.snsserver.mapper;
 
-import me.liiot.snsserver.model.post.PostImageUploadInfo;
+import me.liiot.snsserver.model.post.Post;
 import me.liiot.snsserver.model.post.PostUploadInfo;
-
-import java.util.List;
 
 public interface PostMapper {
 
@@ -11,7 +9,5 @@ public interface PostMapper {
 
     int getPostId(String userId);
 
-    void insertImage(PostImageUploadInfo imageUploadInfo);
-
-    void insertImages(List<PostImageUploadInfo> imageUploadInfos);
+    Post getPost(int postId);
 }

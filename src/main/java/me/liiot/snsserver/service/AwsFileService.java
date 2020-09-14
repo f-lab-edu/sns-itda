@@ -2,7 +2,9 @@ package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
+import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.util.FileNameUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,12 @@ public class AwsFileService implements FileService {
     private String bucket;
 
     private S3Client s3Client;
+
+    private FileMapper fileMapper;
+
+    public AwsFileService(FileMapper fileMapper) {
+        this.fileMapper = fileMapper;
+    }
 
     @Autowired
     public AwsFileService(S3Client s3Client) {
@@ -106,6 +114,18 @@ public class AwsFileService implements FileService {
             }
         }
         return fileInfos;
+    }
+
+    @Override
+    public boolean isExistImages(int postId) {
+
+        return fileMapper.isExistImages(postId);
+    }
+
+    @Override
+    public List<Image> getImages(int postId) {
+
+        return fileMapper.getImages(postId);
     }
 
     @Override

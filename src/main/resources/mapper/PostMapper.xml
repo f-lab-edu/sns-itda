@@ -13,21 +13,9 @@
         ORDER BY createTime DESC LIMIT 1
     </select>
 
-    <insert id="insertImage" parameterType="me.liiot.snsserver.model.post.PostImageUploadInfo">
-        INSERT INTO image(postId, imageName, imagePath, seq)
-        VALUES(#{postId}, #{imageName}, #{imagePath}, #{seq})
-    </insert>
-
-    <insert id="insertImages" parameterType="java.util.List">
-        INSERT INTO image(postId, imageName, imagePath, seq)
-        VALUES
-        <foreach collection="imageUploadInfos" item="info" separator=",">
-            (
-            #{info.postId},
-            #{info.imageName},
-            #{info.imagePath},
-            #{info.seq}
-            )
-        </foreach>
-    </insert>
+    <select id="getPost" parameterType="int" resultType="me.liiot.snsserver.model.post.Post">
+        SELECT id, userId, content, createTime
+        FROM post
+        WHERE id = #{postId}
+    </select>
 </mapper>
