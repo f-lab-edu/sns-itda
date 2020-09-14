@@ -13,6 +13,10 @@ public interface FileService {
 
     List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException;
 
+    void uploadImage(int postId, FileInfo fileInfo);
+
+    void uploadImages(int postId, List<FileInfo> fileInfos);
+
     boolean isExistImages(int postId);
 
     List<Image> getImages(int postId);

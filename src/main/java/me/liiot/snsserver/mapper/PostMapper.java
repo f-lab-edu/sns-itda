@@ -7,7 +7,7 @@ public interface PostMapper {
 
     void insertPost(PostUploadInfo postUploadInfo);
 
-    int getPostId(String userId);
+    int getLatestPostId(String userId);
 
     Post getPost(int postId);
 }

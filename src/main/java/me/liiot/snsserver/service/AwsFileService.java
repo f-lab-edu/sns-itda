@@ -1,12 +1,13 @@
 package me.liiot.snsserver.service;
 
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.Image;
+import me.liiot.snsserver.model.post.ImageUploadInfo;
 import me.liiot.snsserver.util.FileNameUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 @Profile("prod")
 public class AwsFileService implements FileService {
 
@@ -34,18 +36,9 @@ public class AwsFileService implements FileService {
     @Value("${itda.aws.s3.bucket.name}")
     private String bucket;
 
-    private S3Client s3Client;
+    private final S3Client s3Client;
 
-    private FileMapper fileMapper;
-
-    public AwsFileService(FileMapper fileMapper) {
-        this.fileMapper = fileMapper;
-    }
-
-    @Autowired
-    public AwsFileService(S3Client s3Client) {
-        this.s3Client = s3Client;
-    }
+    private final FileMapper fileMapper;
 
     @Override
     public FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException {
@@ -114,6 +107,34 @@ public class AwsFileService implements FileService {
             }
         }
         return fileInfos;
+    }
+
+    @Override
+    public void uploadImage(int postId, FileInfo fileInfo) {
+        ImageUploadInfo imageUploadInfo =
+                new ImageUploadInfo(
+                        postId,
+                        fileInfo.getFileName(),
+                        fileInfo.getFilePath(), 1);
+
+        fileMapper.insertImage(imageUploadInfo);
+    }
+
+    @Override
+    public void uploadImages(int postId, List<FileInfo> fileInfos) {
+        List<ImageUploadInfo> imageUploadInfos = new ArrayList<>();
+        int fileInfosLen = fileInfos.size();
+        for (int i=0; i<fileInfosLen; i++) {
+            ImageUploadInfo imageUploadInfo =
+                    new ImageUploadInfo(
+                            postId,
+                            fileInfos.get(i).getFileName(),
+                            fileInfos.get(i).getFilePath(),
+                            i+1);
+            imageUploadInfos.add(imageUploadInfo);
+        }
+
+        fileMapper.insertImages(imageUploadInfos);
     }
 
     @Override

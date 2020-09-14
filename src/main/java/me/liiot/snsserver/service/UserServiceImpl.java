@@ -1,5 +1,6 @@
 package me.liiot.snsserver.service;
 
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
@@ -7,7 +8,6 @@ import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,17 +17,12 @@ import org.springframework.web.multipart.MultipartFile;
   비즈니스 로직을 처리할 클래스
 */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    private FileService fileService;
-
-    @Autowired
-    public UserServiceImpl(UserMapper userMapper, FileService fileService) {
-        this.userMapper = userMapper;
-        this.fileService = fileService;
-    }
+    private final FileService fileService;
 
     @Override
     public void signUpUser(UserSignUpParam userSignUpParam) {

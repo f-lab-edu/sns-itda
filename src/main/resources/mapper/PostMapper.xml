@@ -7,7 +7,7 @@
         VALUES(#{userId}, #{content})
     </insert>
 
-    <select id="getPostId" parameterType="String" resultType="int">
+    <select id="getLatestPostId" parameterType="String" resultType="int">
         SELECT id FROM post
         WHERE userId = #{userId}
         ORDER BY createTime DESC LIMIT 1
