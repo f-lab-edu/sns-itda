@@ -18,4 +18,11 @@
         FROM post
         WHERE id = #{postId}
     </select>
+
+    <select id="getPostsByUserId" parameterType="String" resultType="me.liiot.snsserver.model.post.Post">
+        SELECT id, userId, content, createTime
+        FROM post
+        WHERE userId = #{userId}
+        ORDER BY createTime DESC
+    </select>
 </mapper>

@@ -11,4 +11,6 @@ public interface PostService {
     public void uploadPost(User user, String content, List<MultipartFile> images);
 
     public Post getPost(int postId);
+
+    public List<Post> getPostsByUser(String userId);
 }

@@ -42,24 +42,43 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPost(int postId) {
 
-        boolean isExistImages = fileService.isExistImages(postId);
-        if (isExistImages) {
-            List<Image> images = fileService.getImages(postId);
-            Post postWithNoImages = postMapper.getPost(postId);
+        Post post = postMapper.getPost(postId);
 
-            Post post = Post.builder()
-                    .id(postWithNoImages.getId())
-                    .userId(postWithNoImages.getUserId())
-                    .content(postWithNoImages.getContent())
-                    .createTime(postWithNoImages.getCreateTime())
+        Post postWithImages = toPostWithImages(post);
+
+        if (postWithImages != null) return postWithImages;
+        else return post;
+    }
+
+    @Override
+    public List<Post> getPostsByUser(String userId) {
+
+        List<Post> posts = postMapper.getPostsByUserId(userId);
+
+        for (Post post : posts) {
+            Post postWithImages = toPostWithImages(post);
+
+            if (postWithImages != null) {
+                posts.set(posts.indexOf(post), postWithImages);
+            }
+        }
+        return posts;
+    }
+
+    private Post toPostWithImages(Post post) {
+
+        boolean isExistImages = fileService.isExistImages(post.getId());
+        if (isExistImages) {
+            List<Image> images = fileService.getImages(post.getId());
+
+            return Post.builder()
+                    .id(post.getId())
+                    .userId(post.getUserId())
+                    .content(post.getContent())
+                    .createTime(post.getCreateTime())
                     .images(images)
                     .build();
-
-            return post;
-        } else {
-            Post post = postMapper.getPost(postId);
-
-            return post;
         }
+        return null;
     }
 }
