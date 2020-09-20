@@ -7,7 +7,7 @@ import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.model.post.ImageUploadInfo;
-import me.liiot.snsserver.util.FileNameUtil;
+import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -43,68 +43,20 @@ public class AwsFileService implements FileService {
     @Override
     public FileInfo uploadFile(MultipartFile file, String userId) throws FileUploadException {
 
-        String newFileName = FileNameUtil.changeFileName(file);
-        StringBuilder key = new StringBuilder();
-        key.append(userId).append("/").append(newFileName);
+        String newFileName = FileUtil.changeFileName(file);
 
-        try {
-            byte[] attachment = file.getBytes();
-            s3Client.putObject(
-                    PutObjectRequest.builder()
-                            .bucket(bucket)
-                            .key(String.valueOf(key))
-                            .build(),
-                    RequestBody.fromByteBuffer(ByteBuffer.wrap(attachment)));
-
-            URL reportUrl = s3Client.utilities()
-                    .getUrl(GetUrlRequest.builder()
-                            .bucket(bucket)
-                            .key(String.valueOf(key))
-                            .build()
-                    );
-
-            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(reportUrl));
-
-            return fileInfo;
-        } catch (SdkServiceException | SdkClientException | IOException e) {
-            throw new FileUploadException("파일 업로드에 실패했습니다.", e);
-        }
+        return createFileInfo(file, userId, newFileName);
     }
 
     @Override
     public List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException {
 
         List<FileInfo> fileInfos = new ArrayList<>();
-        HashMap<String, String> newFileNames = FileNameUtil.changeFileNames(files);
+        HashMap<String, String> newFileNames = FileUtil.changeFileNames(files);
 
-        int filesLen = files.size();
-        for (int i=0; i<filesLen; i++) {
-
-            String newFileName = newFileNames.get(files.get(i).getOriginalFilename());
-            StringBuilder key = new StringBuilder();
-            key.append(userId).append("/").append(newFileName);
-
-            try {
-                byte[] attachment = files.get(i).getBytes();
-                s3Client.putObject(
-                        PutObjectRequest.builder()
-                                .bucket(bucket)
-                                .key(String.valueOf(key))
-                                .build(),
-                        RequestBody.fromByteBuffer(ByteBuffer.wrap(attachment)));
-
-                URL reportUrl = s3Client.utilities()
-                        .getUrl(GetUrlRequest.builder()
-                                .bucket(bucket)
-                                .key(String.valueOf(key))
-                                .build()
-                        );
-
-                FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(reportUrl));
-                fileInfos.add(fileInfo);
-            } catch (SdkServiceException | SdkClientException | IOException e) {
-                throw new FileUploadException("파일 업로드에 실패했습니다.", e);
-            }
+        for (MultipartFile file : files) {
+            String newFileName = newFileNames.get(file.getOriginalFilename());
+            fileInfos.add(createFileInfo(file, userId, newFileName));
         }
         return fileInfos;
     }
@@ -112,10 +64,7 @@ public class AwsFileService implements FileService {
     @Override
     public void uploadImage(int postId, FileInfo fileInfo) {
         ImageUploadInfo imageUploadInfo =
-                new ImageUploadInfo(
-                        postId,
-                        fileInfo.getFileName(),
-                        fileInfo.getFilePath(), 1);
+                FileUtil.toImageUploadInfo(postId, fileInfo, 1);
 
         fileMapper.insertImage(imageUploadInfo);
     }
@@ -123,14 +72,10 @@ public class AwsFileService implements FileService {
     @Override
     public void uploadImages(int postId, List<FileInfo> fileInfos) {
         List<ImageUploadInfo> imageUploadInfos = new ArrayList<>();
-        int fileInfosLen = fileInfos.size();
-        for (int i=0; i<fileInfosLen; i++) {
+
+        for (FileInfo info : fileInfos) {
             ImageUploadInfo imageUploadInfo =
-                    new ImageUploadInfo(
-                            postId,
-                            fileInfos.get(i).getFileName(),
-                            fileInfos.get(i).getFilePath(),
-                            i+1);
+                    FileUtil.toImageUploadInfo(postId, info, fileInfos.indexOf(info) + 1);
             imageUploadInfos.add(imageUploadInfo);
         }
 
@@ -186,6 +131,34 @@ public class AwsFileService implements FileService {
             s3Client.deleteObjects(request);
         } catch (S3Exception e) {
             throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.", e);
+        }
+    }
+
+    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
+        StringBuilder key = new StringBuilder();
+        key.append(userId).append("/").append(newFileName);
+
+        try {
+            byte[] attachment = file.getBytes();
+            s3Client.putObject(
+                    PutObjectRequest.builder()
+                            .bucket(bucket)
+                            .key(String.valueOf(key))
+                            .build(),
+                    RequestBody.fromByteBuffer(ByteBuffer.wrap(attachment)));
+
+            URL reportUrl = s3Client.utilities()
+                    .getUrl(GetUrlRequest.builder()
+                            .bucket(bucket)
+                            .key(String.valueOf(key))
+                            .build()
+                    );
+
+            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(reportUrl));
+
+            return fileInfo;
+        } catch (SdkServiceException | SdkClientException | IOException e) {
+            throw new FileUploadException("파일 업로드에 실패했습니다.", e);
         }
     }
 }

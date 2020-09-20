@@ -7,7 +7,7 @@ import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.model.post.ImageUploadInfo;
-import me.liiot.snsserver.util.FileNameUtil;
+import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -31,56 +31,28 @@ public class LocalFileService implements FileService {
     private final FileMapper fileMapper;
 
     @Override
-    public FileInfo uploadFile(MultipartFile targetFile,
+    public FileInfo uploadFile(MultipartFile file,
                                String userId) throws FileUploadException {
 
-        String newFileName = FileNameUtil.changeFileName(targetFile);
+        String newFileName = FileUtil.changeFileName(file);
 
         checkDirectory(userId);
 
-        StringBuilder filePath = new StringBuilder()
-                .append(baseDir)
-                .append(File.separator)
-                .append(userId)
-                .append(File.separator)
-                .append(newFileName);
-
-        try {
-            targetFile.transferTo(new File(String.valueOf(filePath)));
-            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(filePath));
-
-            return fileInfo;
-        } catch (IOException e) {
-            throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
-        }
+        return createFileInfo(file, userId, newFileName);
     }
 
     @Override
-    public List<FileInfo> uploadFiles(List<MultipartFile> targetFiles,
+    public List<FileInfo> uploadFiles(List<MultipartFile> files,
                                       String userId) throws FileUploadException {
 
         List<FileInfo> fileInfos = new ArrayList<>();
-        HashMap<String, String> newFileNames = FileNameUtil.changeFileNames(targetFiles);
+        HashMap<String, String> newFileNames = FileUtil.changeFileNames(files);
 
         checkDirectory(userId);
 
-        for (MultipartFile targetFile : targetFiles) {
-            StringBuilder filePath = new StringBuilder()
-                    .append(baseDir)
-                    .append(File.separator)
-                    .append(userId)
-                    .append(File.separator)
-                    .append(newFileNames.get(targetFile.getOriginalFilename()));
-
-            try {
-                targetFile.transferTo(new File(String.valueOf(filePath)));
-                FileInfo fileInfo = new FileInfo(newFileNames.get(targetFile.getOriginalFilename()),
-                        String.valueOf(filePath));
-
-                fileInfos.add(fileInfo);
-            } catch (IOException e) {
-                throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
-            }
+        for (MultipartFile file : files) {
+            String newFileName = newFileNames.get(file.getOriginalFilename());
+            fileInfos.add(createFileInfo(file, userId, newFileName));
         }
         return fileInfos;
     }
@@ -88,10 +60,7 @@ public class LocalFileService implements FileService {
     @Override
     public void uploadImage(int postId, FileInfo fileInfo) {
         ImageUploadInfo imageUploadInfo =
-                new ImageUploadInfo(
-                        postId,
-                        fileInfo.getFileName(),
-                        fileInfo.getFilePath(), 1);
+                FileUtil.toImageUploadInfo(postId, fileInfo, 1);
 
         fileMapper.insertImage(imageUploadInfo);
     }
@@ -99,14 +68,10 @@ public class LocalFileService implements FileService {
     @Override
     public void uploadImages(int postId, List<FileInfo> fileInfos) {
         List<ImageUploadInfo> imageUploadInfos = new ArrayList<>();
-        int fileInfosLen = fileInfos.size();
-        for (int i=0; i<fileInfosLen; i++) {
+
+        for (FileInfo info : fileInfos) {
             ImageUploadInfo imageUploadInfo =
-                    new ImageUploadInfo(
-                            postId,
-                            fileInfos.get(i).getFileName(),
-                            fileInfos.get(i).getFilePath(),
-                            i+1);
+                    FileUtil.toImageUploadInfo(postId, info, fileInfos.indexOf(info) + 1);
             imageUploadInfos.add(imageUploadInfo);
         }
 
@@ -159,6 +124,24 @@ public class LocalFileService implements FileService {
 
         if (!directory.exists()) {
             directory.mkdir();
+        }
+    }
+
+    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
+        StringBuilder filePath = new StringBuilder()
+                .append(baseDir)
+                .append(File.separator)
+                .append(userId)
+                .append(File.separator)
+                .append(newFileName);
+
+        try {
+            file.transferTo(new File(String.valueOf(filePath)));
+            FileInfo fileInfo = new FileInfo(newFileName, String.valueOf(filePath));
+
+            return fileInfo;
+        } catch (IOException e) {
+            throw new FileUploadException("파일을 업로드하는데 실패하였습니다.", e);
         }
     }
 }
