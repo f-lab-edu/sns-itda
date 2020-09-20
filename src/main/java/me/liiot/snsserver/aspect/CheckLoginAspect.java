@@ -2,11 +2,11 @@ package me.liiot.snsserver.aspect;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.util.SessionKeys;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
@@ -15,16 +15,17 @@ import javax.servlet.http.HttpSession;
 
 @Component
 @Aspect
+@RequiredArgsConstructor
 public class CheckLoginAspect {
 
-    @Autowired
-    HttpSession httpSession;
+    private final HttpSession httpSession;
+
+    private final ObjectMapper mapper;
 
     @Before("@annotation(me.liiot.snsserver.annotation.CheckLogin)")
     public void checkLogin() throws HttpClientErrorException {
 
         User currentUser = null;
-        ObjectMapper mapper = new ObjectMapper();
 
         try {
             String jsonStr = (String) httpSession.getAttribute(SessionKeys.USER);

@@ -2,23 +2,22 @@ package me.liiot.snsserver.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import me.liiot.snsserver.exception.FileUploadException;
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.model.User;
 import me.liiot.snsserver.util.SessionKeys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 
 @Service
+@RequiredArgsConstructor
 public class SessionLoginService implements LoginService {
 
-    @Autowired
-    HttpSession httpSession;
+    private final HttpSession httpSession;
+
+    private final ObjectMapper mapper;
 
     @Override
     public void loginUser(User user) {
-        ObjectMapper mapper = new ObjectMapper();
 
         try {
             String jsonStr = mapper.writeValueAsString(user);
