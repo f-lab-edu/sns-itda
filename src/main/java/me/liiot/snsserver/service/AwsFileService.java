@@ -24,6 +24,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,18 +52,18 @@ public class AwsFileService implements FileService {
     @Override
     public List<FileInfo> uploadFiles(List<MultipartFile> files, String userId) throws FileUploadException {
 
-        List<FileInfo> fileInfos = new ArrayList<>();
         HashMap<String, String> newFileNames = FileUtil.changeFileNames(files);
+        List<FileInfo> fileInfos = files.stream()
+                .map(file ->
+                        createFileInfo(file, userId, newFileNames.get(file.getOriginalFilename())))
+                .collect(Collectors.toList());
 
-        for (MultipartFile file : files) {
-            String newFileName = newFileNames.get(file.getOriginalFilename());
-            fileInfos.add(createFileInfo(file, userId, newFileName));
-        }
         return fileInfos;
     }
 
     @Override
     public void uploadImage(int postId, FileInfo fileInfo) {
+
         ImageUploadInfo imageUploadInfo =
                 FileUtil.toImageUploadInfo(postId, fileInfo, 1);
 
@@ -71,13 +72,10 @@ public class AwsFileService implements FileService {
 
     @Override
     public void uploadImages(int postId, List<FileInfo> fileInfos) {
-        List<ImageUploadInfo> imageUploadInfos = new ArrayList<>();
 
-        for (FileInfo info : fileInfos) {
-            ImageUploadInfo imageUploadInfo =
-                    FileUtil.toImageUploadInfo(postId, info, fileInfos.indexOf(info) + 1);
-            imageUploadInfos.add(imageUploadInfo);
-        }
+        List<ImageUploadInfo> imageUploadInfos = fileInfos.stream()
+                .map(info -> FileUtil.toImageUploadInfo(postId, info, fileInfos.indexOf(info) + 1))
+                .collect(Collectors.toList());
 
         fileMapper.insertImages(imageUploadInfos);
     }
@@ -117,11 +115,9 @@ public class AwsFileService implements FileService {
         ListObjectsResponse response = s3Client.listObjects(listObjects);
         List<S3Object> s3Objects = response.contents();
 
-        ArrayList<ObjectIdentifier> toDelete = new ArrayList<ObjectIdentifier>();
-
-        for (S3Object object: s3Objects) {
-            toDelete.add(ObjectIdentifier.builder().key(object.key()).build());
-        }
+        List<ObjectIdentifier> toDelete = s3Objects.stream()
+                .map(object -> ObjectIdentifier.builder().key(object.key()).build())
+                .collect(Collectors.toList());
 
         try {
             DeleteObjectsRequest request = DeleteObjectsRequest.builder()
