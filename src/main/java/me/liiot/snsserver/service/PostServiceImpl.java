@@ -6,6 +6,7 @@ import me.liiot.snsserver.model.post.*;
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.model.post.PostUploadInfo;
 import me.liiot.snsserver.model.user.User;
+import org.springframework.expression.AccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,6 +57,33 @@ public class PostServiceImpl implements PostService {
                 .collect(Collectors.toList());
         
         return postsWithImages;
+    }
+
+    @Override
+    public void updatePost(User user, int postId, String content) throws AccessException{
+
+        boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
+        if (isAuthorizedOnPost) {
+            postMapper.updatePost(postId, content);
+        } else {
+            throw new AccessException("해당 게시물의 수정 권한이 없습니다.");
+        }
+    }
+
+    @Override
+    public void deletePost(User user, int postId) throws AccessException{
+
+        boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
+        if (isAuthorizedOnPost) {
+            boolean isExistImages = fileService.isExistImages(postId);
+            if (isExistImages) {
+                fileService.deleteImages(postId);
+            }
+
+            postMapper.deletePost(postId);
+        } else {
+            throw new AccessException("해당 게시물의 삭제 권한이 없습니다.");
+        }
     }
 
     private Post addImages(Post post) {

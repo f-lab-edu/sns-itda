@@ -25,4 +25,6 @@ public interface FileService {
 
     void deleteDirectory(String userId);
 
+    void deleteImages(int postId);
+
 }

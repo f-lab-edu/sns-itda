@@ -119,15 +119,20 @@ public class AwsFileService implements FileService {
                 .map(object -> ObjectIdentifier.builder().key(object.key()).build())
                 .collect(Collectors.toList());
 
-        try {
-            DeleteObjectsRequest request = DeleteObjectsRequest.builder()
-                    .bucket(bucket)
-                    .delete(Delete.builder().objects(toDelete).build())
-                    .build();
-            s3Client.deleteObjects(request);
-        } catch (S3Exception e) {
-            throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.", e);
-        }
+        sendDeleteObjectsRequest(toDelete);
+    }
+
+    @Override
+    public void deleteImages(int postId) {
+        List<String> imagePaths = fileMapper.getImagePaths(postId);
+
+        List<ObjectIdentifier> toDelete = imagePaths.stream()
+                .map(path -> ObjectIdentifier.builder().key(path.substring(baseUrl.length())).build())
+                .collect(Collectors.toList());
+
+        sendDeleteObjectsRequest(toDelete);
+
+        fileMapper.deleteImages(postId);
     }
 
     private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
@@ -155,6 +160,19 @@ public class AwsFileService implements FileService {
             return fileInfo;
         } catch (SdkServiceException | SdkClientException | IOException e) {
             throw new FileUploadException("파일 업로드에 실패했습니다.", e);
+        }
+    }
+
+    private void sendDeleteObjectsRequest(List<ObjectIdentifier> toDelete) {
+
+        try {
+            DeleteObjectsRequest request = DeleteObjectsRequest.builder()
+                    .bucket(bucket)
+                    .delete(Delete.builder().objects(toDelete).build())
+                    .build();
+            s3Client.deleteObjects(request);
+        } catch (S3Exception e) {
+            throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.", e);
         }
     }
 }

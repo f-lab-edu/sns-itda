@@ -25,4 +25,20 @@
         WHERE userId = #{userId}
         ORDER BY createTime DESC
     </select>
+
+    <select id="isAuthorizedOnPost" resultType="boolean">
+        SELECT EXISTS
+        (SELECT id FROM post WHERE id = #{postId} AND userId = #{userId})
+    </select>
+
+    <update id="updatePost">
+        UPDATE post
+        SET content = #{content}
+        WHERE id = #{postId}
+    </update>
+
+    <delete id="deletePost">
+        DELETE FROM post
+        WHERE id = #{postId}
+    </delete>
 </mapper>

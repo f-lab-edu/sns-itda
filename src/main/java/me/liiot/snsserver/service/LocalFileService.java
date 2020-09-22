@@ -112,6 +112,15 @@ public class LocalFileService implements FileService {
         }
     }
 
+    @Override
+    public void deleteImages(int postId) {
+        List<String> imagePaths = fileMapper.getImagePaths(postId);
+
+        imagePaths.stream().forEach(this::deleteFile);
+
+        fileMapper.deleteImages(postId);
+    }
+
     private void checkDirectory(String userId) {
 
         StringBuilder dirPath = new StringBuilder()
