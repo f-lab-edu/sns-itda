@@ -42,7 +42,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = postMapper.getPost(postId);
 
-        return addImages(post);
+        return post;
     }
 
     @Override
@@ -51,22 +51,5 @@ public class PostServiceImpl implements PostService {
         List<Post> posts = postMapper.getPostsByUserId(userId);
         
         return posts;
-    }
-
-    private Post addImages(Post post) {
-
-        boolean isExistImages = fileService.isExistImages(post.getId());
-        if (isExistImages) {
-            List<Image> images = fileService.getImages(post.getId());
-
-            return Post.builder()
-                    .id(post.getId())
-                    .userId(post.getUserId())
-                    .content(post.getContent())
-                    .createTime(post.getCreateTime())
-                    .images(images)
-                    .build();
-        }
-        return post;
     }
 }
