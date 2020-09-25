@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,12 +49,8 @@ public class PostServiceImpl implements PostService {
     public List<Post> getPostsByUser(String userId) {
 
         List<Post> posts = postMapper.getPostsByUserId(userId);
-
-        List<Post> postsWithImages = posts.stream()
-                .map(post -> addImages(post))
-                .collect(Collectors.toList());
         
-        return postsWithImages;
+        return posts;
     }
 
     private Post addImages(Post post) {

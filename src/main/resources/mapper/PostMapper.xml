@@ -2,6 +2,28 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="me.liiot.snsserver.mapper.PostMapper">
+    <resultMap type="me.liiot.snsserver.model.post.Post" id="postsWithImagesMap">
+        <constructor>
+            <idArg column="id" javaType="_int"/>
+            <arg column="userId" javaType="String"/>
+            <arg column="content" javaType="String"/>
+            <arg column="createTime" javaType="java.sql.Date"/>
+        </constructor>
+        <id property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="content" column="content"/>
+        <result property="createTime" column="createTime"/>
+        <collection property="images" ofType="me.liiot.snsserver.model.post.Image" resultMap="imagesMap"/>
+    </resultMap>
+
+    <resultMap type="me.liiot.snsserver.model.post.Image" id="imagesMap">
+        <id property="id" column="id"/>
+        <result property="postId" column="postId"/>
+        <result property="imageName" column="imageName"/>
+        <result property="imagePath" column="imagePath"/>
+        <result property="seq" column="seq"/>
+    </resultMap>
+
     <insert id="insertPost" parameterType="me.liiot.snsserver.model.post.PostUploadInfo">
         INSERT INTO post(userId, content)
         VALUES(#{userId}, #{content})
@@ -19,10 +41,11 @@
         WHERE id = #{postId}
     </select>
 
-    <select id="getPostsByUserId" parameterType="String" resultType="me.liiot.snsserver.model.post.Post">
-        SELECT id, userId, content, createTime
-        FROM post
-        WHERE userId = #{userId}
-        ORDER BY createTime DESC
+    <select id="getPostsByUserId" parameterType="String" resultMap="postsWithImagesMap">
+        SELECT p.id, p.userId, p.content, p.createTime, i.id, i.postId, i.imageName, i.imagePath, i.seq
+        FROM post as p
+        LEFT OUTER JOIN image as i ON i.postId = p.id
+        WHERE p.userId = #{userId}
+        ORDER BY p.createTime DESC
     </select>
 </mapper>
