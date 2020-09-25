@@ -1,6 +1,5 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.mapper.PostMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.*;
@@ -10,7 +9,6 @@ import me.liiot.snsserver.model.user.User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -42,24 +40,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public Post getPost(int postId) {
 
-        boolean isExistImages = fileService.isExistImages(postId);
-        if (isExistImages) {
-            List<Image> images = fileService.getImages(postId);
-            Post postWithNoImages = postMapper.getPost(postId);
+        Post post = postMapper.getPost(postId);
 
-            Post post = Post.builder()
-                    .id(postWithNoImages.getId())
-                    .userId(postWithNoImages.getUserId())
-                    .content(postWithNoImages.getContent())
-                    .createTime(postWithNoImages.getCreateTime())
-                    .images(images)
-                    .build();
-
-            return post;
-        } else {
-            Post post = postMapper.getPost(postId);
-
-            return post;
-        }
+        return post;
     }
 }
