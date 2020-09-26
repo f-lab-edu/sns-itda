@@ -51,7 +51,7 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
-    @PutMapping("/{postId}")
+    @PatchMapping("/{postId}")
     @CheckLogin
     public ResponseEntity<Void> updatePost(@PathVariable int postId,
                                            String content,
