@@ -6,6 +6,7 @@ import me.liiot.snsserver.model.post.*;
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.model.post.PostUploadInfo;
 import me.liiot.snsserver.model.user.User;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.expression.AccessException;
 import me.liiot.snsserver.util.CacheKeys;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,6 +15,17 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+/*
+@Cacheable(cacheNames = ..., key = ...)
+: 해당 메소드의 리턴값을 캐시에 저장. 메소드가 호출될 때마다 캐시 저장소에
+저장된 캐시가 있는지 확인하고 있다면 메소드를 실행하지 않고 캐시를 반환.
+cacheNames - 캐시 이름
+key - 캐시에 접근하기 위한 키 값
+
+@CacheEvict(cacheNames = ..., key = ..., allEntries = ...)
+: 지정된 키에 해당하는 캐시를 삭제
+allEntries - true일 경우, 같은 이름을 가진 모든 캐시를 삭제
+ */
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -23,6 +35,7 @@ public class PostServiceImpl implements PostService {
     private final FileService fileService;
 
     @Override
+    @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")
     public void uploadPost(User user, String content, List<MultipartFile> images) {
         PostUploadInfo postUploadInfo = new PostUploadInfo(user.getUserId(), content);
 
@@ -41,7 +54,6 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(value = CacheKeys.POST, key = "#postId")
     public Post getPost(int postId) {
 
         Post post = postMapper.getPost(postId);
@@ -50,6 +62,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Cacheable(cacheNames = CacheKeys.FEED, key = "#userId")
     public List<Post> getPostsByUser(String userId) {
 
         List<Post> posts = postMapper.getPostsByUserId(userId);
@@ -58,6 +71,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")
     public void updatePost(User user, int postId, String content) throws AccessException{
 
         boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
@@ -69,6 +83,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")
     public void deletePost(User user, int postId) throws AccessException{
 
         boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
