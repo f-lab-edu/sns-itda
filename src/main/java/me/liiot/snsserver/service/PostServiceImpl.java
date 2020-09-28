@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +46,7 @@ public class PostServiceImpl implements PostService {
 
         Post post = postMapper.getPost(postId);
 
-        return addImages(post);
+        return post;
     }
 
     @Override
@@ -55,11 +54,7 @@ public class PostServiceImpl implements PostService {
 
         List<Post> posts = postMapper.getPostsByUserId(userId);
 
-        List<Post> postsWithImages = posts.stream()
-                .map(post -> addImages(post))
-                .collect(Collectors.toList());
-        
-        return postsWithImages;
+        return posts;
     }
 
     @Override
@@ -87,22 +82,5 @@ public class PostServiceImpl implements PostService {
         } else {
             throw new AccessException("해당 게시물의 삭제 권한이 없습니다.");
         }
-    }
-
-    private Post addImages(Post post) {
-
-        boolean isExistImages = fileService.isExistImages(post.getId());
-        if (isExistImages) {
-            List<Image> images = fileService.getImages(post.getId());
-
-            return Post.builder()
-                    .id(post.getId())
-                    .userId(post.getUserId())
-                    .content(post.getContent())
-                    .createTime(post.getCreateTime())
-                    .images(images)
-                    .build();
-        }
-        return post;
     }
 }

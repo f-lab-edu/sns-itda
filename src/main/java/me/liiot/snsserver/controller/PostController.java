@@ -42,7 +42,7 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    @GetMapping("/{userId}/feed")
+    @GetMapping("/users/{userId}")
     @CheckLogin
     public ResponseEntity<List<Post>> getUserFeed(@PathVariable String userId) {
 
