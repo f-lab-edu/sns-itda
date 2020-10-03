@@ -24,11 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.web.util.NestedServletException;
 
 import java.sql.Date;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -183,7 +181,7 @@ class UserControllerTest {
     @Test
     public void updateUserTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
 
         MockMultipartFile testFile = new MockMultipartFile(
                 "profileImage",
@@ -198,20 +196,6 @@ class UserControllerTest {
                 .birth(Date.valueOf("1990-02-20"))
                 .profileMessage("안녕하세요")
                 .build();
-
-        User updatedTestUser = User.builder()
-                .userId("test1")
-                .password(PasswordEncryptor.encrypt("1234"))
-                .name("Sarah")
-                .phoneNumber("01012345678")
-                .email("test1@abc.com")
-                .birth(Date.valueOf("1990-02-20"))
-                .profileMessage("안녕하세요")
-                .profileImageName("profileImage")
-                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage")
-                .build();
-
-        when(userService.updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile))).thenReturn(updatedTestUser);
 
         // multipart로 request를 보내면 요청 방식이 "POST"로 하드코딩되어 있어 이를 임시로 "PUT"으로 변경
         MockMultipartHttpServletRequestBuilder builder =
@@ -233,13 +217,12 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
-        verify(loginService).loginUser(updatedTestUser);
     }
 
     @Test
     public void updateUserPasswordTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
 
         UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
                 "1234", "5678", "5678");
@@ -259,7 +242,7 @@ class UserControllerTest {
     @Test
     public void updateUserPasswordTestWithFailAndInvalidValue() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
 
         UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
                 "5678", "1234", "6789");
@@ -283,7 +266,7 @@ class UserControllerTest {
     @Test
     public void deleteUserTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
 
         mockMvc.perform(
                 delete("/users/my-account")
@@ -299,7 +282,7 @@ class UserControllerTest {
     @Test
     public void deleteUserTestWithFailAndInvalidPassword() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
 
         doThrow(InvalidValueException.class).when(userService).deleteUser(eq(encryptedTestUser), anyString());
 

@@ -20,11 +20,6 @@ public class RedisConfig {
     private int port;
 
     @Bean
-    public GenericJackson2JsonRedisSerializer genericJackson2JsonRedisSerializer() {
-        return new GenericJackson2JsonRedisSerializer();
-    }
-
-    @Bean
     RedisConnectionFactory redisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(hostName);

@@ -7,4 +7,6 @@ public interface LoginService {
     public void loginUser(User user);
 
     public void logoutUser();
+
+    public String getCurrentUserId();
 }

@@ -1,33 +1,26 @@
 package me.liiot.snsserver.aspect;
 
 import lombok.RequiredArgsConstructor;
-import me.liiot.snsserver.model.User;
-import me.liiot.snsserver.util.SessionKeys;
+import me.liiot.snsserver.service.LoginService;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
-
-import javax.servlet.http.HttpSession;
 
 @Component
 @Aspect
 @RequiredArgsConstructor
 public class CheckLoginAspect {
 
-    private final HttpSession httpSession;
-
-    private final GenericJackson2JsonRedisSerializer serializer;
+    private final LoginService loginService;
 
     @Before("@annotation(me.liiot.snsserver.annotation.CheckLogin)")
     public void checkLogin() throws HttpClientErrorException {
 
-        byte[] serializedSource = (byte[]) httpSession.getAttribute(SessionKeys.USER);
-        User currentUser = serializer.deserialize(serializedSource, User.class);
+        String currentUserId = loginService.getCurrentUserId();
 
-        if (currentUser == null) {
+        if (currentUserId == null) {
             throw new HttpClientErrorException(HttpStatus.UNAUTHORIZED);
         }
     }
