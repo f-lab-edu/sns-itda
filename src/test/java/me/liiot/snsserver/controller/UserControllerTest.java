@@ -147,7 +147,7 @@ class UserControllerTest {
                 .andExpect(status().isOk());
 
         verify(userService).getLoginUser(any(UserIdAndPassword.class));
-        verify(loginService).loginUser(encryptedTestUser);
+        verify(loginService).loginUser(encryptedTestUser.getUserId());
     }
 
     @Test
@@ -165,7 +165,7 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized());
 
         verify(userService).getLoginUser(any(UserIdAndPassword.class));
-        verify(loginService, times(0)).loginUser(any(User.class));
+        verify(loginService, times(0)).loginUser(any(String.class));
     }
 
     @Test

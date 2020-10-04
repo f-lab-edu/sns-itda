@@ -65,7 +65,7 @@ public class UserController {
             return RESPONSE_UNAUTHORIZED;
         }
 
-        loginService.loginUser(user);
+        loginService.loginUser(user.getUserId());
         return RESPONSE_OK;
     }
 
