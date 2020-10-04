@@ -1,6 +1,6 @@
 package me.liiot.snsserver.config;
 
-import me.liiot.snsserver.util.CacheKeys;
+import me.liiot.snsserver.util.CacheNames;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -37,8 +37,8 @@ public class CacheConfig {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
 
         Map<String, RedisCacheConfiguration> redisCacheConfigMap = new HashMap<>();
-        redisCacheConfigMap.put(CacheKeys.POST, defaultConfig.entryTtl(Duration.ofHours(1)));
-        redisCacheConfigMap.put(CacheKeys.FEED, defaultConfig.entryTtl(Duration.ofSeconds(5L)));
+        redisCacheConfigMap.put(CacheNames.POST, defaultConfig.entryTtl(Duration.ofHours(1)));
+        redisCacheConfigMap.put(CacheNames.FEED, defaultConfig.entryTtl(Duration.ofSeconds(5L)));
 
         RedisCacheManager redisCacheManager = RedisCacheManager.builder(connectionFactory)
                 .withInitialCacheConfigurations(redisCacheConfigMap)

@@ -1,6 +1,6 @@
 package me.liiot.snsserver.util;
 
-public class CacheKeys {
+public class CacheNames {
 
     public static final String POST = "post";
 

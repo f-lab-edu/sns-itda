@@ -44,7 +44,7 @@ public class PostController {
 
     @GetMapping
     @CheckLogin
-    public ResponseEntity<List<Post>> getUserFeed(@RequestParam(value = "user") String userId) {
+    public ResponseEntity<List<Post>> getUserFeed(@RequestParam(value = "userId") String userId) {
 
         List<Post> posts = postService.getPostsByUser(userId);
 

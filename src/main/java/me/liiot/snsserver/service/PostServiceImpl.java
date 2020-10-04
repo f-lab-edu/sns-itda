@@ -9,7 +9,7 @@ import me.liiot.snsserver.model.user.User;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.expression.AccessException;
-import me.liiot.snsserver.util.CacheKeys;
+import me.liiot.snsserver.util.CacheNames;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +40,7 @@ public class PostServiceImpl implements PostService {
     private final FileService fileService;
 
     @Override
-    @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")
+    @CacheEvict(cacheNames = CacheNames.FEED, key = "#user.userId")
     public void uploadPost(User user, String content, List<MultipartFile> images) {
         PostUploadInfo postUploadInfo = new PostUploadInfo(user.getUserId(), content);
 
@@ -59,7 +59,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheKeys.POST, key = "#postId")
+    @Cacheable(cacheNames = CacheNames.POST, key = "#postId")
     public Post getPost(int postId) {
 
         Post post = postMapper.getPost(postId);
@@ -68,7 +68,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Cacheable(cacheNames = CacheKeys.FEED, key = "#userId")
+    @Cacheable(cacheNames = CacheNames.FEED, key = "#userId")
     public List<Post> getPostsByUser(String userId) {
 
         List<Post> posts = postMapper.getPostsByUserId(userId);
@@ -77,8 +77,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Caching(evict = {@CacheEvict(cacheNames = CacheKeys.POST, key = "#postId"),
-                      @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")})
+    @Caching(evict = {@CacheEvict(cacheNames = CacheNames.POST, key = "#postId"),
+                      @CacheEvict(cacheNames = CacheNames.FEED, key = "#user.userId")})
     public void updatePost(User user, int postId, String content) throws AccessException{
 
         boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
@@ -90,8 +90,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    @Caching(evict = {@CacheEvict(cacheNames = CacheKeys.POST, key = "#postId"),
-                      @CacheEvict(cacheNames = CacheKeys.FEED, key = "#user.userId")})
+    @Caching(evict = {@CacheEvict(cacheNames = CacheNames.POST, key = "#postId"),
+                      @CacheEvict(cacheNames = CacheNames.FEED, key = "#user.userId")})
     public void deletePost(User user, int postId) throws AccessException{
 
         boolean isAuthorizedOnPost = postMapper.isAuthorizedOnPost(user.getUserId(), postId);
