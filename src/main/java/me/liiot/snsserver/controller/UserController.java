@@ -65,7 +65,7 @@ public class UserController {
             return RESPONSE_UNAUTHORIZED;
         }
 
-        loginService.loginUser(user);
+        loginService.loginUser(user.getUserId());
         return RESPONSE_OK;
     }
 
@@ -83,8 +83,7 @@ public class UserController {
                                              @CurrentUser User currentUser) {
 
         try {
-            User updatedUser = userService.updateUser(currentUser, userUpdateParam, profileImage);
-            loginService.loginUser(updatedUser);
+            userService.updateUser(currentUser, userUpdateParam, profileImage);
 
             return RESPONSE_OK;
         } catch (FileUploadException e) {
@@ -110,7 +109,7 @@ public class UserController {
     @DeleteMapping("/my-account")
     @CheckLogin
     public ResponseEntity<String> deleteUser(@RequestParam(name="password") String inputPassword,
-                                           @CurrentUser User currentUser) {
+                                             @CurrentUser User currentUser) {
 
         try {
             userService.deleteUser(currentUser, inputPassword);

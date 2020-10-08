@@ -1,6 +1,5 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
@@ -73,7 +72,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(User currentUser,
+    public void updateUser(User currentUser,
                            UserUpdateParam userUpdateParam,
                            MultipartFile profileImage) {
 
@@ -93,9 +92,6 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         userMapper.updateUser(userUpdateInfo);
-        User updatedUser = userMapper.getUser(currentUser.getUserId());
-
-        return updatedUser;
     }
 
     @Override

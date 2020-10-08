@@ -1,24 +1,30 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.model.User;
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.util.SessionKeys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 
 @Service
+@RequiredArgsConstructor
 public class SessionLoginService implements LoginService {
 
-    @Autowired
-    HttpSession httpSession;
+    private final HttpSession httpSession;
 
     @Override
-    public void loginUser(User user) {
-        httpSession.setAttribute(SessionKeys.USER, user);
+    public void loginUser(String userId) {
+
+        httpSession.setAttribute(SessionKeys.USER_ID, userId);
     }
 
     @Override
     public void logoutUser() {
         httpSession.invalidate();
+    }
+
+    @Override
+    public String getCurrentUserId() {
+
+        return (String) httpSession.getAttribute(SessionKeys.USER_ID);
     }
 }

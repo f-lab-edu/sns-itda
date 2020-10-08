@@ -124,6 +124,24 @@
             <version>2.14.10</version>
         </dependency>
 
+        <!--
+        spring-session-data-redis
+        : 세션 데이터를 Redis에 저장하기 위한 모듈
+        -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
+        <!--
+        spring-boot-starter-data-redis
+        : Redis를 사용하기 위한 스타터 (기본 내장 클라이언트 - Lettuce)
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
 
         <!--
         spring-boot-starter-test
