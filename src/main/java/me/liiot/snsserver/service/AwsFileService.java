@@ -5,6 +5,7 @@ import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.model.post.ImageUploadInfo;
 import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,6 +81,18 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    public boolean isExistImages(int postId) {
+
+        return fileMapper.isExistImages(postId);
+    }
+
+    @Override
+    public List<Image> getImages(int postId) {
+
+        return fileMapper.getImages(postId);
+    }
+
+    @Override
     public void deleteFile(String filePath) {
         if (filePath != null) {
             String key = filePath.substring(baseUrl.length());
@@ -106,15 +119,20 @@ public class AwsFileService implements FileService {
                 .map(object -> ObjectIdentifier.builder().key(object.key()).build())
                 .collect(Collectors.toList());
 
-        try {
-            DeleteObjectsRequest request = DeleteObjectsRequest.builder()
-                    .bucket(bucket)
-                    .delete(Delete.builder().objects(toDelete).build())
-                    .build();
-            s3Client.deleteObjects(request);
-        } catch (S3Exception e) {
-            throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.", e);
-        }
+        sendDeleteObjectsRequest(toDelete);
+    }
+
+    @Override
+    public void deleteImages(int postId) {
+        List<String> imagePaths = fileMapper.getImagePaths(postId);
+
+        List<ObjectIdentifier> toDelete = imagePaths.stream()
+                .map(path -> ObjectIdentifier.builder().key(path.substring(baseUrl.length())).build())
+                .collect(Collectors.toList());
+
+        sendDeleteObjectsRequest(toDelete);
+
+        fileMapper.deleteImages(postId);
     }
 
     private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
@@ -142,6 +160,19 @@ public class AwsFileService implements FileService {
             return fileInfo;
         } catch (SdkServiceException | SdkClientException | IOException e) {
             throw new FileUploadException("파일 업로드에 실패했습니다.", e);
+        }
+    }
+
+    private void sendDeleteObjectsRequest(List<ObjectIdentifier> toDelete) {
+
+        try {
+            DeleteObjectsRequest request = DeleteObjectsRequest.builder()
+                    .bucket(bucket)
+                    .delete(Delete.builder().objects(toDelete).build())
+                    .build();
+            s3Client.deleteObjects(request);
+        } catch (S3Exception e) {
+            throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.", e);
         }
     }
 }

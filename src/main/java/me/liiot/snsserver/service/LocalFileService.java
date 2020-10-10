@@ -5,6 +5,7 @@ import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.mapper.FileMapper;
 import me.liiot.snsserver.model.FileInfo;
+import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.model.post.ImageUploadInfo;
 import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
@@ -77,6 +78,18 @@ public class LocalFileService implements FileService {
     }
 
     @Override
+    public boolean isExistImages(int postId) {
+
+        return fileMapper.isExistImages(postId);
+    }
+
+    @Override
+    public List<Image> getImages(int postId) {
+
+        return fileMapper.getImages(postId);
+    }
+
+    @Override
     public void deleteFile(String filePath) {
 
         if (filePath != null) {
@@ -97,6 +110,15 @@ public class LocalFileService implements FileService {
         if (!isSuccess) {
             throw new FileDeleteException("파일을 삭제하는데 실패하였습니다.");
         }
+    }
+
+    @Override
+    public void deleteImages(int postId) {
+        List<String> imagePaths = fileMapper.getImagePaths(postId);
+
+        imagePaths.stream().forEach(this::deleteFile);
+
+        fileMapper.deleteImages(postId);
     }
 
     private void checkDirectory(String userId) {

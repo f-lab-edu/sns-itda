@@ -4,16 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.sql.Date;
+import java.util.List;
+
 @Getter
 @Builder
 @AllArgsConstructor
 public class Post {
 
-    private final String name;
+    private final int id;
 
-    private final String phoneNumber;
+    private final String userId;
 
-    private final String email;
+    private final String content;
 
-    private final String profileMessage;
+    private final Date createTime;
+
+    private List<Image> images;
+
+    public Post(int id, String userId, String content, Date createTime) {
+        this.id = id;
+        this.userId = userId;
+        this.content = content;
+        this.createTime = createTime;
+    }
 }

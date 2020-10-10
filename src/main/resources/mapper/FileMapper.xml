@@ -19,4 +19,26 @@
             )
         </foreach>
     </insert>
+
+    <select id="isExistImages" parameterType="int" resultType="boolean">
+        SELECT EXISTS
+        (SELECT id FROM image WHERE postId = #{postId});
+    </select>
+
+    <select id="getImages" parameterType="int" resultType="me.liiot.snsserver.model.post.Image">
+        SELECT id, postId, imageName, imagePath, seq
+        FROM image
+        WHERE postId = #{postId}
+        ORDER BY seq
+    </select>
+
+    <select id="getImagePaths" parameterType="int" resultType="String">
+        SELECT imagePath FROM image
+        WHERE postId = #{postId}
+    </select>
+
+    <delete id="deleteImages" parameterType="int">
+        DELETE FROM image
+        WHERE postId = #{postId}
+    </delete>
 </mapper>

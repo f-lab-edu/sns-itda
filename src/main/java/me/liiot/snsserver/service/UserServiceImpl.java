@@ -6,8 +6,10 @@ import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.model.user.*;
+import me.liiot.snsserver.util.CacheNames;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -116,6 +118,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @CacheEvict(cacheNames = CacheNames.FEED, key = "#currentUser.userId")
     public void deleteUser(User currentUser, String inputPassword) throws InvalidValueException {
 
         boolean isValidPassword = PasswordEncryptor.isMatch(inputPassword, currentUser.getPassword());
