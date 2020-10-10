@@ -6,6 +6,7 @@ import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.model.post.Post;
 import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.service.PostService;
+import org.springframework.expression.AccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static me.liiot.snsserver.util.HttpResponses.RESPONSE_CREATED;
+import static me.liiot.snsserver.util.HttpResponses.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,5 +40,43 @@ public class PostController {
         Post post = postService.getPost(postId);
 
         return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
+    @GetMapping
+    @CheckLogin
+    public ResponseEntity<List<Post>> getUserFeed(@RequestParam(value = "userId") String userId) {
+
+        List<Post> posts = postService.getPostsByUser(userId);
+
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{postId}")
+    @CheckLogin
+    public ResponseEntity<Void> updatePost(@PathVariable int postId,
+                                           String content,
+                                           @CurrentUser User currentUser) {
+
+        try {
+            postService.updatePost(currentUser, postId, content);
+
+            return RESPONSE_OK;
+        } catch (AccessException e) {
+            return RESPONSE_UNAUTHORIZED;
+        }
+    }
+
+    @DeleteMapping("/{postId}")
+    @CheckLogin
+    public ResponseEntity<Void> deletePost(@PathVariable int postId,
+                                           @CurrentUser User currentUser) {
+
+        try {
+            postService.deletePost(currentUser, postId);
+
+            return RESPONSE_OK;
+        } catch (AccessException e) {
+            return RESPONSE_UNAUTHORIZED;
+        }
     }
 }

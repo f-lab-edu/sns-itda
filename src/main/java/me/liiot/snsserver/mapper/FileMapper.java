@@ -14,4 +14,8 @@ public interface FileMapper {
     boolean isExistImages(int postId);
 
     List<Image> getImages(int postId);
+
+    List<String> getImagePaths(int postId);
+
+    void deleteImages(int postId);
 }
