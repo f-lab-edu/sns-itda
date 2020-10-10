@@ -10,10 +10,10 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 @Configuration
 public class RedisConfig {
 
-    @Value("${spring.redis.host}")
+    @Value("${spring.redis.session.host}")
     private String hostName;
 
-    @Value("${spring.redis.port}")
+    @Value("${spring.redis.session.port}")
     private int port;
 
     @Bean
