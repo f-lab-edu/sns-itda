@@ -4,6 +4,7 @@ import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

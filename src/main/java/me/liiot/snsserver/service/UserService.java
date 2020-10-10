@@ -1,7 +1,7 @@
 package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {

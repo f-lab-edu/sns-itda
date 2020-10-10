@@ -3,7 +3,7 @@ package me.liiot.snsserver.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
-import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.PasswordEncryptor;

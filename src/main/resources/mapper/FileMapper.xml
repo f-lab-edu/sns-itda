@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.liiot.snsserver.mapper.FileMapper">
+    <insert id="insertImage" parameterType="me.liiot.snsserver.model.post.ImageUploadInfo">
+        INSERT INTO image(postId, imageName, imagePath, seq)
+        VALUES(#{postId}, #{imageName}, #{imagePath}, #{seq})
+    </insert>
+
+    <insert id="insertImages" parameterType="java.util.List">
+        INSERT INTO image(postId, imageName, imagePath, seq)
+        VALUES
+        <foreach collection="imageUploadInfos" item="info" separator=",">
+            (
+            #{info.postId},
+            #{info.imageName},
+            #{info.imagePath},
+            #{info.seq}
+            )
+        </foreach>
+    </insert>
+
+    <select id="isExistImages" parameterType="int" resultType="boolean">
+        SELECT EXISTS
+        (SELECT id FROM image WHERE postId = #{postId});
+    </select>
+
+    <select id="getImages" parameterType="int" resultType="me.liiot.snsserver.model.post.Image">
+        SELECT id, postId, imageName, imagePath, seq
+        FROM image
+        WHERE postId = #{postId}
+        ORDER BY seq
+    </select>
+
+    <select id="getImagePaths" parameterType="int" resultType="String">
+        SELECT imagePath FROM image
+        WHERE postId = #{postId}
+    </select>
+
+    <delete id="deleteImages" parameterType="int">
+        DELETE FROM image
+        WHERE postId = #{postId}
+    </delete>
+</mapper>

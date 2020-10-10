@@ -1,19 +1,21 @@
 package me.liiot.snsserver.controller;
 
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.FileUploadException;
-import me.liiot.snsserver.model.*;
+import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueIdException;
 import me.liiot.snsserver.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import static me.liiot.snsserver.util.HttpResponses.*;
 
 /*
 @RestController
@@ -24,19 +26,13 @@ import org.springframework.web.multipart.MultipartFile;
 : 요청 URL과 해당 URL을 처리할 클래스나 메소드에 연결
  */
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
-    private static final ResponseEntity RESPONSE_OK = new ResponseEntity(HttpStatus.OK);
-    private static final ResponseEntity RESPONSE_CREATED = new ResponseEntity(HttpStatus.CREATED);
-    private static final ResponseEntity RESPONSE_CONFLICT = new ResponseEntity(HttpStatus.CONFLICT);
-    private static final ResponseEntity RESPONSE_UNAUTHORIZED = new ResponseEntity(HttpStatus.UNAUTHORIZED);
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private LoginService loginService;
+    private final LoginService loginService;
 
     @PostMapping
     public ResponseEntity<Void> signUpUser(UserSignUpParam userSignUpParam) {
