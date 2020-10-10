@@ -31,4 +31,14 @@
         WHERE postId = #{postId}
         ORDER BY seq
     </select>
+
+    <select id="getImagePaths" parameterType="int" resultType="String">
+        SELECT imagePath FROM image
+        WHERE postId = #{postId}
+    </select>
+
+    <delete id="deleteImages" parameterType="int">
+        DELETE FROM image
+        WHERE postId = #{postId}
+    </delete>
 </mapper>
