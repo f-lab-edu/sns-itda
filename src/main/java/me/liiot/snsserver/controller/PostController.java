@@ -42,9 +42,9 @@ public class PostController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
-    @GetMapping("/{userId}/feed")
+    @GetMapping
     @CheckLogin
-    public ResponseEntity<List<Post>> getUserFeed(@PathVariable String userId) {
+    public ResponseEntity<List<Post>> getUserFeed(@RequestParam(value = "userId") String userId) {
 
         List<Post> posts = postService.getPostsByUser(userId);
 
