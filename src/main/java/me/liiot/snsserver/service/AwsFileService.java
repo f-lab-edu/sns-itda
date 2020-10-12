@@ -11,6 +11,7 @@ import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.exception.SdkServiceException;
@@ -21,7 +22,6 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -62,6 +62,7 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    @Transactional
     public void uploadImage(int postId, FileInfo fileInfo) {
 
         ImageUploadInfo imageUploadInfo =
@@ -71,6 +72,7 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    @Transactional
     public void uploadImages(int postId, List<FileInfo> fileInfos) {
 
         List<ImageUploadInfo> imageUploadInfos = fileInfos.stream()
@@ -81,12 +83,14 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isExistImages(int postId) {
 
         return fileMapper.isExistImages(postId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Image> getImages(int postId) {
 
         return fileMapper.getImages(postId);
@@ -123,6 +127,7 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    @Transactional
     public void deleteImages(int postId) {
         List<String> imagePaths = fileMapper.getImagePaths(postId);
 
