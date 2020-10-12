@@ -7,7 +7,7 @@
 
 ### 사용 기술 및 개발 환경
 
-- IntelliJ, Spring Boot, Maven, Java, MySQL, MyBatis
+- IntelliJ, Spring Boot, Maven, Java, MySQL, MyBatis, Redis
 
 
 
@@ -29,6 +29,8 @@
   1. 회원가입 / 탈퇴
   2. 로그인 / 로그아웃
   3. 회원정보 수정
+  4. 게시글 작성 / 수정 / 삭제 / 조회 기능
+  5. 피드 조회 기능
 
 
 
