@@ -1,6 +1,7 @@
 package me.liiot.snsserver.config.tool;
 
 import me.liiot.snsserver.util.ClientDatabases;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.Assert;
 
 /*
@@ -15,7 +16,8 @@ public class ClientDatabaseContext {
 
     public static void set(String clientDatabase) {
         Assert.notNull(clientDatabase, "clientDatabase cannot be null");
-        Assert.isTrue(clientDatabase == ClientDatabases.MASTER || clientDatabase == ClientDatabases.SLAVE,
+        Assert.isTrue(StringUtils.equals(clientDatabase, ClientDatabases.MASTER) ||
+                                StringUtils.equals(clientDatabase, ClientDatabases.SLAVE),
                       "clientDatabase can be only master or slave");
         CONTEXT.set(clientDatabase);
     }
