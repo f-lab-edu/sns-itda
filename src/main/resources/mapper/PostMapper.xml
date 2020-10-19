@@ -50,6 +50,14 @@
         ORDER BY p.createTime DESC
     </select>
 
+    <select id="getPostsOfAllFollows" parameterType="String" resultMap="postsWithImagesMap">
+        SELECT p.id, p.userId, p.content, p.createTime, i.id, i.postId, i.imageName, i.imagePath, i.seq
+        FROM post as p
+        LEFT OUTER JOIN image as i ON i.postId = p.id
+        WHERE p.userId IN (SELECT followUserId FROM follow WHERE userId = #{userId})
+        ORDER BY p.createTime DESC
+    </select>
+
     <select id="isAuthorizedOnPost" resultType="boolean">
         SELECT EXISTS
         (SELECT id FROM post WHERE id = #{postId} AND userId = #{userId})

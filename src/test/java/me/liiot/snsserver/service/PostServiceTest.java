@@ -166,6 +166,23 @@ class PostServiceTest {
         verify(postMapper).getPostsByUserId("test2");
     }
 
+    @DisplayName("메인 / 사용자가 팔로우한 모든 계정의 게시물 조회")
+    @Test
+    void getPostsOfAllFollowsTest() {
+        Post testPost1 = new Post(11, "test3", "content", Date.valueOf("2020-10-19"));
+        Post testPost2 = new Post(12, "test4", "content", Date.valueOf("2020-10-19"));
+        List<Post> posts = new ArrayList<>();
+        posts.add(testPost1);
+        posts.add(testPost2);
+
+        when(postMapper.getPostsOfAllFollows("test1")).thenReturn(posts);
+
+        List<Post> result = postService.getPostsOfAllFollows(testUser.getUserId());
+
+        assertEquals(result, posts);
+        verify(postMapper).getPostsOfAllFollows("test1");
+    }
+
     @DisplayName("자신이 작성한 게시물 수정")
     @Test
     void updatePostTestWithSuccess() {
