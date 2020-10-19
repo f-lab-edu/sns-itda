@@ -11,14 +11,14 @@ public class FollowServiceImpl implements FollowService {
     private final FollowMapper followMapper;
 
     @Override
-    public void addFollowList(String userId, String targetId) {
+    public void addFollowList(String userId, String followUserId) {
 
-        followMapper.insertFollow(userId, targetId);
+        followMapper.insertFollow(userId, followUserId);
     }
 
     @Override
-    public void deleteFollowList(String userId, String targetId) {
+    public void deleteFollowList(String userId, String followUserId) {
 
-        followMapper.deleteFollow(userId, targetId);
+        followMapper.deleteFollow(userId, followUserId);
     }
 }

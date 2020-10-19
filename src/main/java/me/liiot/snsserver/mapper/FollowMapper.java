@@ -9,8 +9,8 @@ import org.springframework.data.repository.query.Param;
 public interface FollowMapper {
 
     @ClientDatabase(value = ClientDatabases.MASTER)
-    void insertFollow(@Param("userId") String userId, @Param("targetId") String targetId);
+    void insertFollow(@Param("userId") String userId, @Param("followUserId") String followUserId);
 
     @ClientDatabase(value = ClientDatabases.MASTER)
-    void deleteFollow(@Param("userId") String userId, @Param("targetId") String targetId);
+    void deleteFollow(@Param("userId") String userId, @Param("followUserId") String followUserId);
 }
