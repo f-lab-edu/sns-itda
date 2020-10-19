@@ -3,14 +3,14 @@
 
 <mapper namespace="me.liiot.snsserver.mapper.FollowMapper">
     <insert id="insertFollow">
-        INSERT INTO follow(userId, targetId)
-        VALUES(#{userId}, #{targetId})
+        INSERT INTO follow(userId, followUserId)
+        VALUES(#{userId}, #{followUserId})
     </insert>
 
     <delete id="deleteFollow">
         DELETE FROM follow
         WHERE userId = #{userId}
-        AND targetId = #{targetId}
+        AND followUserId = #{followUserId}
     </delete>
 
     <select id="getFollowList" parameterType="String" resultType="me.liiot.snsserver.model.follow.Follow">

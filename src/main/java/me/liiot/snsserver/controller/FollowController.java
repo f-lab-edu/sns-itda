@@ -24,23 +24,23 @@ public class FollowController {
 
     private final AlarmService alarmService;
 
-    @PostMapping("/{targetId}")
+    @PostMapping("/{followUserId}")
     @CheckLogin
-    public ResponseEntity<Void> followUser(@PathVariable String targetId,
+    public ResponseEntity<Void> followUser(@PathVariable String followUserId,
                                            @CurrentUser User currentUser) {
 
-        followService.addFollowList(currentUser.getUserId(), targetId);
-        alarmService.addAlarm(currentUser.getUserId(), targetId, AlarmType.FOLLOWING);
+        followService.addFollowList(currentUser.getUserId(), followUserId);
+        alarmService.addAlarm(currentUser.getUserId(), followUserId, AlarmType.FOLLOWING);
 
         return HttpResponses.RESPONSE_CREATED;
     }
 
-    @DeleteMapping("/{targetId}")
+    @DeleteMapping("/{followUserId}")
     @CheckLogin
-    public ResponseEntity<Void> unfollowUser(@PathVariable String targetId,
+    public ResponseEntity<Void> unfollowUser(@PathVariable String followUserId,
                                              @CurrentUser User currentUser) {
 
-        followService.deleteFollowList(currentUser.getUserId(), targetId);
+        followService.deleteFollowList(currentUser.getUserId(), followUserId);
 
         return HttpResponses.RESPONSE_OK;
     }

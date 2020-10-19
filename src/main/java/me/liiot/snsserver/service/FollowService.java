@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface FollowService {
 
-    public void addFollowList(String userId, String targetId);
+    public void addFollowList(String userId, String followUserId);
 
-    public void deleteFollowList(String userId, String targetId);
+    public void deleteFollowList(String userId, String followUserId);
 
     public List<Follow> getFollowList(String userId);
 
