@@ -12,4 +12,16 @@
         WHERE userId = #{userId}
         AND targetId = #{targetId}
     </delete>
+
+    <select id="getFollowList" parameterType="String" resultType="me.liiot.snsserver.model.follow.Follow">
+        SELECT id, userId, followUserId, startFollow
+        FROM follow
+        WHERE userId = #{userId}
+    </select>
+
+    <select id="getFollowingList" parameterType="String" resultType="me.liiot.snsserver.model.follow.Follow">
+        SELECT id, userId, followUserId, startFollow
+        FROM follow
+        WHERE followUserId = #{followUserId}
+    </select>
 </mapper>
