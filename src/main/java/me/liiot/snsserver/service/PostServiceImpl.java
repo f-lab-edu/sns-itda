@@ -78,6 +78,14 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    public List<Post> getPostsOfAllFollows(String userId) {
+
+        List<Post> posts = postMapper.getPostsOfAllFollows(userId);
+
+        return posts;
+    }
+
+    @Override
     @Caching(evict = {@CacheEvict(cacheNames = CacheNames.POST, key = "#postId"),
                       @CacheEvict(cacheNames = CacheNames.FEED, key = "#user.userId")})
     public void updatePost(User user, int postId, String content) throws AccessException{

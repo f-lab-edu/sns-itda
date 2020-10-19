@@ -51,6 +51,15 @@ public class PostController {
         return new ResponseEntity<>(posts, HttpStatus.OK);
     }
 
+    @GetMapping("/my-follows")
+    @CheckLogin
+    public ResponseEntity<List<Post>> getPostsOfAllFollows(@CurrentUser User currentUser) {
+
+        List<Post> posts = postService.getPostsOfAllFollows(currentUser.getUserId());
+
+        return new ResponseEntity<>(posts, HttpStatus.OK);
+    }
+
     @PatchMapping("/{postId}")
     @CheckLogin
     public ResponseEntity<Void> updatePost(@PathVariable int postId,

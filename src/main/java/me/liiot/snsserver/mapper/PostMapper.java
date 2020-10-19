@@ -25,6 +25,9 @@ public interface PostMapper {
     List<Post> getPostsByUserId(String userId);
 
     @ClientDatabase(value = ClientDatabases.SLAVE)
+    List<Post> getPostsOfAllFollows(String userId);
+
+    @ClientDatabase(value = ClientDatabases.SLAVE)
     boolean isAuthorizedOnPost(@Param("userId") String userId, @Param("postId") int postId);
 
     @ClientDatabase(value = ClientDatabases.MASTER)

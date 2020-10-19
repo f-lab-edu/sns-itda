@@ -15,6 +15,8 @@ public interface PostService {
 
     public List<Post> getPostsByUser(String userId);
 
+    public List<Post> getPostsOfAllFollows(String userId);
+
     public void updatePost(User user, int postId, String content) throws AccessException;
 
     public void deletePost(User user, int postId) throws AccessException;
