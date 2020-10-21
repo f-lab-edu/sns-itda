@@ -5,6 +5,7 @@ import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,10 +23,6 @@ import javax.sql.DataSource;
     * basePackages: 매퍼를 검색할 패키지 지정
     * 매퍼 인터페이스 파일이 있는 가장 상위 패키지를 지정하면 지정된 패키지에서 하위 패키지를 모두 검색
 
- @PropertySource
- : 지정한 위치의 프로퍼티 파일을 읽어 스프링 Environment 오브젝트에 저장
-   @Configuration 클래스와 함께 사용
-
  @Autowired
  : 필요한 의존 객체의 타입에 해당하는 빈을 찾아 주입
 
@@ -34,14 +31,13 @@ import javax.sql.DataSource;
  */
 @Configuration
 @MapperScan(basePackages = "me.liiot.snsserver.mapper")
-@PropertySource("classpath:/db-secret.properties")
 public class MyBatisConfig {
 
     @Autowired
     private ApplicationContext applicationContext;
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(DataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier(value = "routingDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:/mapper/**/*.xml"));
