@@ -1,8 +1,26 @@
 package me.liiot.snsserver.service;
 
-public interface FollowService {
+import lombok.RequiredArgsConstructor;
+import me.liiot.snsserver.enumeration.AlarmType;
+import me.liiot.snsserver.mapper.FollowMapper;
+import org.springframework.stereotype.Service;
 
-    public void addFollowList(String userId, String followUserId);
+@Service
+@RequiredArgsConstructor
+public class FollowService {
 
-    public void deleteFollowList(String userId, String followUserId);
+    private final FollowMapper followMapper;
+
+    private final AlarmService alarmService;
+
+    public void addFollowList(String userId, String followUserId) {
+
+        followMapper.insertFollow(userId, followUserId);
+        alarmService.addAlarm(userId, followUserId, AlarmType.FOLLOWING);
+    }
+
+    public void deleteFollowList(String userId, String followUserId) {
+
+        followMapper.deleteFollow(userId, followUserId);
+    }
 }
