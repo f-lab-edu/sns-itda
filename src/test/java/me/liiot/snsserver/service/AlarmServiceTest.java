@@ -26,7 +26,7 @@ class AlarmServiceTest {
     private AlarmMapper alarmMapper;
 
     @InjectMocks
-    private AlarmServiceImpl alarmService;
+    private AlarmService alarmService;
 
     private User testUser;
 

@@ -23,7 +23,7 @@ class FollowServiceTest {
     private FollowMapper followMapper;
 
     @InjectMocks
-    private FollowServiceImpl followService;
+    private FollowService followService;
 
     private User testUser;
 

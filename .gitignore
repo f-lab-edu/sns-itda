@@ -41,3 +41,6 @@ lombok.config
 
 ### Image Directory ###
 images/
+
+### Firebase Service ###
+sns-itda-firebase-adminsdk.json
