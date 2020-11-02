@@ -11,6 +11,10 @@ import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
 
+/*
+@PostConstruct
+: 빈의 초기화를 위해 모든 의존성이 주입이 된 후에 실행됨
+ */
 @Configuration
 public class FirebaseConfig {
 

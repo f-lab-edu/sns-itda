@@ -4,11 +4,7 @@ import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.enumeration.AlarmType;
 import me.liiot.snsserver.enumeration.PushType;
 import me.liiot.snsserver.mapper.FollowMapper;
-import me.liiot.snsserver.model.push.PushMessage;
 import org.springframework.stereotype.Service;
-
-import java.sql.Date;
-import java.time.LocalDate;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +22,7 @@ public class FollowService {
 
         alarmService.addAlarm(userId, followUserId, AlarmType.FOLLOWING);
 
-        PushMessage pushMessage = new PushMessage(
-                PushType.FOLLOWING.getType(),
-                String.format(PushType.FOLLOWING.getContent(), userId),
-                Date.valueOf(LocalDate.now())
-        );
-        pushService.sendPushMessage(pushMessage);
+        pushService.sendPushMessage(userId, followUserId, PushType.FOLLOWING);
     }
 
     public void deleteFollowList(String userId, String followUserId) {
