@@ -51,8 +51,7 @@ public class FirebasePushService implements PushService {
                 .build();
 
         try {
-            String response = FirebaseMessaging.getInstance().sendAsync(message).get();
-            System.out.println(response);
+            FirebaseMessaging.getInstance().sendAsync(message).get();
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }

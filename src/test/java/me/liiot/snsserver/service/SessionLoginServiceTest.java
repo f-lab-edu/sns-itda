@@ -53,11 +53,11 @@ class SessionLoginServiceTest {
         String jsonStr = mapper.writeValueAsString(testUser);
 
         ArgumentCaptor<String> valueCapture = ArgumentCaptor.forClass(String.class);
-        doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER), valueCapture.capture());
+        doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER_ID), valueCapture.capture());
 
-        sessionLoginService.loginUser(testUser);
+        sessionLoginService.loginUser(testUser.getUserId());
 
-        verify(mockHttpSession).setAttribute(SessionKeys.USER, jsonStr);
+        verify(mockHttpSession).setAttribute(SessionKeys.USER_ID, jsonStr);
         assertEquals(jsonStr, valueCapture.getValue());
     }
 
@@ -65,11 +65,11 @@ class SessionLoginServiceTest {
     @Test
     void logoutUserTest() {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, testUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser);
 
         sessionLoginService.logoutUser();
 
         verify(mockHttpSession).invalidate();
-        assertNull(mockHttpSession.getAttribute(SessionKeys.USER));
+        assertNull(mockHttpSession.getAttribute(SessionKeys.USER_ID));
     }
 }
