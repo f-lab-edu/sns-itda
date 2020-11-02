@@ -188,14 +188,12 @@ class UserServiceTest {
         when(fileService.uploadFile(testFile, encryptedTestUser.getUserId())).thenReturn(fileInfo);
         when(userMapper.getUser(encryptedTestUser.getUserId())).thenReturn(updatedTestUser);
 
-        User user = userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
+        userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
 
         verify(fileService).deleteFile(encryptedTestUser.getProfileImagePath());
         verify(fileService).uploadFile(testFile, encryptedTestUser.getUserId());
         verify(userMapper).updateUser(any(UserUpdateInfo.class));
         verify(userMapper).getUser("test1");
-
-        assertEquals(true, user.equals(updatedTestUser));
     }
 
     @DisplayName("회원 비밀번호 변경 성공")

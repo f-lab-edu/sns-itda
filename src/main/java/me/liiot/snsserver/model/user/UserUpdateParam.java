@@ -3,7 +3,6 @@ package me.liiot.snsserver.model.user;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Date;
 
