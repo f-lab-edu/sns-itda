@@ -6,7 +6,9 @@ pipeline {
 
     stages {
         stage('Poll') {
-            checkout scm
+            steps {
+                checkout scm
+            }
         }
 
         stage('Build') {
@@ -43,7 +45,8 @@ pipeline {
     post {
         failure {
             mail to: 'cyj199637@gmail.com',
-            subject: 'Jenkins Pipeline Build Fail'
+            subject: 'Jenkins Pipeline Build Fail',
+            body: 'Somthing Errors'
         }
     }
 }
