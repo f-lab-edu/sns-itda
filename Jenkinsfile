@@ -42,7 +42,8 @@ pipeline {
 
     post {
         failure {
-            mail to: cyj199637@gmail.com, subject: 'Jenkins Pipeline Build Fail'
+            mail to: 'cyj199637@gmail.com',
+            subject: 'Jenkins Pipeline Build Fail'
         }
     }
 }
