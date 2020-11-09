@@ -23,7 +23,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/Test-*.xml'
+                    junit '**/reports/TEST-*.xml'
                     archive 'target/*.jar'
                 }
             }
@@ -35,7 +35,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/surefire-reports/Test-*.xml'
+                    junit '**/reports/TEST-*.xml'
                     archive 'target/*.jar'
                 }
             }

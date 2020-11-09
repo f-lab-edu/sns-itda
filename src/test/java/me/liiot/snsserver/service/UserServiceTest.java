@@ -150,29 +150,15 @@ class UserServiceTest {
                 .profileMessage("안녕하세요")
                 .build();
 
-        User updatedTestUser = User.builder()
-                .userId("test1")
-                .password(PasswordEncryptor.encrypt("1234"))
-                .name("Sarah")
-                .phoneNumber("01012345678")
-                .email("test1@abc.com")
-                .birth(Date.valueOf("1990-02-20"))
-                .profileMessage("안녕하세요")
-                .profileImageName("profileImage")
-                .profileImagePath("C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage")
-                .build();
-
         FileInfo fileInfo = new FileInfo("profileImage", "C:\\Users\\cyj19\\Desktop\\Project\\sns-server\\images\\test1\\profileImage");
 
         when(fileService.uploadFile(testFile, encryptedTestUser.getUserId())).thenReturn(fileInfo);
-        when(userMapper.getUser(encryptedTestUser.getUserId())).thenReturn(updatedTestUser);
 
         userService.updateUser(encryptedTestUser, userUpdateParam, testFile);
 
         verify(fileService).deleteFile(encryptedTestUser.getProfileImagePath());
         verify(fileService).uploadFile(testFile, encryptedTestUser.getUserId());
         verify(userMapper).updateUser(any(UserUpdateInfo.class));
-        verify(userMapper).getUser("test1");
     }
 
     @Test
