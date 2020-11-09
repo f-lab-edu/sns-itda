@@ -1,21 +1,30 @@
-node ('master') {
-    stage('Poll') {
-        checkout scm
+pipeline {
+    agent any
+    tools {
+        maven 'M3'
     }
 
-	stage('Build & Unit test') {
-	    withMaven(maven: 'M3') {
-            sh 'mvn clean verify -DskipITs=true'
+    stages {
+        stage('Poll') {
+            checkout scm
+        }
+
+        stage('Build & Unit test') {
+            sh 'mvn clean test -DskipITs=true'
             junit '**/target/surefire-reports/Test-*.xml'
             archive 'target/*.jar'
         }
-	}
 
-	stage('Integration test') {
-	    withMaven(maven: 'M3') {
-    	    sh 'mvn clean verify -Dsurefire.skip=true'
-    	    junit '**/target/surefire-reports/Test-*.xml'
+        stage('Integration test') {
+            sh 'mvn clean test -Dsurefire.skip=true'
+            junit '**/target/surefire-reports/Test-*.xml'
             archive 'target/*.jar'
+        }
+    }
+
+    post {
+        failure {
+            mail to: cyj199637@gmail.com, subject: 'Jenkins Pipeline Build Fail'
         }
     }
 }
