@@ -9,16 +9,34 @@ pipeline {
             checkout scm
         }
 
-        stage('Build & Unit test') {
-            sh 'mvn clean test -DskipITs=true'
-            junit '**/target/surefire-reports/Test-*.xml'
-            archive 'target/*.jar'
+        stage('Build') {
+            steps {
+                sh 'mvn -B -DskipTests clean package'
+            }
+        }
+
+        stage('Unit test') {
+            steps {
+                sh 'mvn test -DskipITs=true'
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/Test-*.xml'
+                    archive 'target/*.jar'
+                }
+            }
         }
 
         stage('Integration test') {
-            sh 'mvn clean test -Dsurefire.skip=true'
-            junit '**/target/surefire-reports/Test-*.xml'
-            archive 'target/*.jar'
+            steps {
+                sh 'mvn test -Dsurefire.skip=true'
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/Test-*.xml'
+                    archive 'target/*.jar'
+                }
+            }
         }
     }
 
