@@ -10,5 +10,5 @@ public interface PushService {
 
     public void deleteToken(String userId);
 
-    public void sendPushMessage(String userId, String receiverId, PushType pushType);
+    public void sendPushMessage(String userId, String receiverId, PushType pushType, String pushMessage);
 }

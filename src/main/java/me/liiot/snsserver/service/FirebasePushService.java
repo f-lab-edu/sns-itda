@@ -2,6 +2,7 @@ package me.liiot.snsserver.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.enumeration.PushType;
@@ -11,9 +12,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.concurrent.ExecutionException;
 
 /*
 @Async
@@ -28,9 +29,14 @@ public class FirebasePushService implements PushService {
     public void setToken(String userId) {
 
         redisTemplate.opsForValue().set(userId, getAccessToken());
+        redisTemplate.expire(userId, Duration.ofHours(1l));
     }
 
     public String getToken(String userId) {
+
+        if (!redisTemplate.hasKey(userId)) {
+            setToken(userId);
+        }
 
         return (String) redisTemplate.opsForValue().get(userId);
     }
@@ -41,18 +47,18 @@ public class FirebasePushService implements PushService {
     }
 
     @Async(value = "taskExecutor")
-    public void sendPushMessage(String userId, String receiverId, PushType type) {
+    public void sendPushMessage(String userId, String receiverId, PushType type, String pushMessage) {
 
         Message message = Message.builder()
                 .putData("title", type.getType())
-                .putData("body", String.format(type.getContent(), userId))
+                .putData("body", pushMessage)
                 .putData("createTime", String.valueOf(LocalDateTime.now()))
                 .setToken(getToken(receiverId))
                 .build();
 
         try {
-            FirebaseMessaging.getInstance().sendAsync(message).get();
-        } catch (ExecutionException | InterruptedException e) {
+            FirebaseMessaging.getInstance().send(message);
+        } catch (FirebaseMessagingException e) {
             e.printStackTrace();
         }
     }

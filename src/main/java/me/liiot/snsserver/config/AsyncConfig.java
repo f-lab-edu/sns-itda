@@ -2,9 +2,10 @@ package me.liiot.snsserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
+
+import static java.util.concurrent.Executors.newCachedThreadPool;
 
 /*
 비동기 처리를 위한 별도의 스레드풀 생성
@@ -23,12 +24,9 @@ public class AsyncConfig {
 
     @Bean
     public Executor taskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(3);
-        executor.setMaxPoolSize(50);
-        executor.setQueueCapacity(300);
-        executor.setThreadNamePrefix("fcmTask-");
-        executor.initialize();
+
+        Executor executor = newCachedThreadPool();
+
         return executor;
     }
 }
