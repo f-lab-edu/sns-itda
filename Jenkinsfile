@@ -24,7 +24,7 @@ pipeline {
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
-                    archive 'target/*.jar'
+                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
@@ -36,7 +36,7 @@ pipeline {
             post {
                 always {
                     junit '**/target/failsafe-reports/*.xml'
-                    archive 'target/*.jar'
+                    archiveArtifacts 'target/*.jar'
                 }
             }
         }

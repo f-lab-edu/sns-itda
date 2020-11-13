@@ -143,6 +143,17 @@
         </dependency>
 
         <!--
+        jasypt-spring-boot-starter
+        : jasypt를 사용하기 위한 스타터
+          property 파일에 있는 설정값을 암호화하기 위함
+        -->
+        <dependency>
+            <groupId>com.github.ulisesbocchio</groupId>
+            <artifactId>jasypt-spring-boot-starter</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <!--
         spring-boot-starter-test
         : Spring Boot 애플리케이션을 테스트하기 위한 스타터
           JUnit, Hamcrest, Mockito를 포함
