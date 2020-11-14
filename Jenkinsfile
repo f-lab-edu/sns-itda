@@ -35,7 +35,7 @@ pipeline {
             }
             post {
                 always {
-                    junit '**/target/failsafe-reports/*.xml'
+                    junit testResults: '**/target/failsafe-reports/*.xml', allowEmptyResults: true
                     archiveArtifacts 'target/*.jar'
                 }
             }
