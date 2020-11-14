@@ -14,6 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'mvn -B -DskipTests clean package'
+                archiveArtifacts 'target/*.jar'
             }
         }
 
@@ -24,7 +25,6 @@ pipeline {
             post {
                 always {
                     junit '**/target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
@@ -36,7 +36,6 @@ pipeline {
             post {
                 always {
                     junit testResults: '**/target/failsafe-reports/*.xml', allowEmptyResults: true
-                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
