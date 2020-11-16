@@ -45,31 +45,28 @@ class SessionLoginServiceTest {
                 .build();
     }
 
-    @DisplayName("로그인")
+    @DisplayName("로그인 성공")
     @Test
-    void loginUserTest() throws JsonProcessingException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonStr = mapper.writeValueAsString(testUser);
+    void loginUserTest() {
 
         ArgumentCaptor<String> valueCapture = ArgumentCaptor.forClass(String.class);
-        doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER), valueCapture.capture());
+        doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER_ID), valueCapture.capture());
 
-        sessionLoginService.loginUser(testUser);
+        sessionLoginService.loginUser(testUser.getUserId());
 
-        verify(mockHttpSession).setAttribute(SessionKeys.USER, jsonStr);
-        assertEquals(jsonStr, valueCapture.getValue());
+        verify(mockHttpSession).setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        assertEquals(testUser.getUserId(), valueCapture.getValue());
     }
 
-    @DisplayName("로그아웃")
+    @DisplayName("로그아웃 성공")
     @Test
     void logoutUserTest() {
 
-        mockHttpSession.setAttribute(SessionKeys.USER, testUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser);
 
         sessionLoginService.logoutUser();
 
         verify(mockHttpSession).invalidate();
-        assertNull(mockHttpSession.getAttribute(SessionKeys.USER));
+        assertNull(mockHttpSession.getAttribute(SessionKeys.USER_ID));
     }
 }

@@ -2,7 +2,7 @@ package me.liiot.snsserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueIdException;
+import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.service.UserService;
@@ -123,7 +123,7 @@ class UserControllerTest {
     @Test
     public void checkUserIdDupeTestWithDupe() throws Exception {
 
-        doThrow(NotUniqueIdException.class).when(userService).checkUserIdDupe("test1");
+        doThrow(NotUniqueUserIdException.class).when(userService).checkUserIdDupe("test1");
 
         mockMvc.perform(get("/users/test1/exists"))
                 .andDo(print())

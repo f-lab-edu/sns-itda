@@ -8,7 +8,7 @@ import me.liiot.snsserver.exception.FileUploadException;
 import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueIdException;
+import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -46,7 +46,7 @@ public class UserController {
 
         try {
             userService.checkUserIdDupe(userId);
-        } catch (NotUniqueIdException e) {
+        } catch (NotUniqueUserIdException e) {
             return RESPONSE_CONFLICT;
         }
         return RESPONSE_OK;
