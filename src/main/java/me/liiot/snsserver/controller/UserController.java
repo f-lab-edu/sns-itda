@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
+
 import static me.liiot.snsserver.util.HttpResponses.*;
 
 /*
@@ -24,6 +26,9 @@ import static me.liiot.snsserver.util.HttpResponses.*;
 
 @RequestMapping
 : 요청 URL과 해당 URL을 처리할 클래스나 메소드에 연결
+
+@Valid
+: 클래스에 정의된 제약조건을 바탕으로 지정된 아규먼트에 대한 유효성 검사 실시
  */
 @RestController
 @RequiredArgsConstructor
@@ -35,7 +40,7 @@ public class UserController {
     private final LoginService loginService;
 
     @PostMapping
-    public ResponseEntity<Void> signUpUser(UserSignUpParam userSignUpParam) {
+    public ResponseEntity<Void> signUpUser(@Valid UserSignUpParam userSignUpParam) {
 
         userService.signUpUser(userSignUpParam);
         return RESPONSE_CREATED;
@@ -53,7 +58,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Void> loginUser(UserIdAndPassword userIdAndPassword) {
+    public ResponseEntity<Void> loginUser(@Valid UserIdAndPassword userIdAndPassword) {
 
         User user = userService.getLoginUser(userIdAndPassword);
 
@@ -74,7 +79,7 @@ public class UserController {
 
     @PutMapping("/my-account")
     @CheckLogin
-    public ResponseEntity<String> updateUser(UserUpdateParam userUpdateParam,
+    public ResponseEntity<String> updateUser(@Valid UserUpdateParam userUpdateParam,
                                              @RequestPart("profileImage") MultipartFile profileImage,
                                              @CurrentUser User currentUser) {
 
@@ -89,7 +94,7 @@ public class UserController {
 
     @PutMapping("/my-account/password")
     @CheckLogin
-    public ResponseEntity<String> updateUserPassword(UserPasswordUpdateParam userPasswordUpdateParam,
+    public ResponseEntity<String> updateUserPassword(@Valid UserPasswordUpdateParam userPasswordUpdateParam,
                                                      @CurrentUser User currentUser) {
 
         try {

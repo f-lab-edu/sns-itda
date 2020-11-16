@@ -3,9 +3,11 @@ package me.liiot.snsserver.controller;
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
+import me.liiot.snsserver.exception.NotExistUserIdException;
 import me.liiot.snsserver.model.post.Post;
 import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.service.PostService;
+import me.liiot.snsserver.util.HttpResponses;
 import org.springframework.expression.AccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,10 @@ public class PostController {
 
         Post post = postService.getPost(postId);
 
+        if (post == null) {
+            return RESPONSE_NOT_FOUND;
+        }
+
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
@@ -46,9 +52,13 @@ public class PostController {
     @CheckLogin
     public ResponseEntity<List<Post>> getUserFeed(@RequestParam(value = "userId") String userId) {
 
-        List<Post> posts = postService.getPostsByUser(userId);
+        try {
+            List<Post> posts = postService.getPostsByUser(userId);
 
-        return new ResponseEntity<>(posts, HttpStatus.OK);
+            return new ResponseEntity<>(posts, HttpStatus.OK);
+        } catch (NotExistUserIdException e) {
+            return RESPONSE_NOT_FOUND;
+        }
     }
 
     @PatchMapping("/{postId}")
