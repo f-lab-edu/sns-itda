@@ -163,11 +163,13 @@ class PostServiceTest {
         posts.add(testPost1);
         posts.add(testPost2);
 
+        when(userMapper.isExistUserId("test2")).thenReturn(true);
         when(postMapper.getPostsByUserId("test2")).thenReturn(posts);
 
         List<Post> targetPosts = postService.getPostsByUser("test2");
 
         assertEquals(targetPosts, posts);
+        verify(userMapper).isExistUserId("test2");
         verify(postMapper).getPostsByUserId("test2");
     }
 
@@ -176,11 +178,12 @@ class PostServiceTest {
     void getPostsByUserTestWithFail() {
 
         when(userMapper.isExistUserId("test100")).thenReturn(false);
-        when(postMapper.getPostsByUserId("test100")).thenThrow();
 
         assertThrows(NotExistUserIdException.class, () -> {
             postService.getPostsByUser("test100");
         });
+
+        verify(userMapper).isExistUserId("test100");
         verify(postMapper, times(0)).getPostsByUserId("test100");
     }
 
