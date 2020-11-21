@@ -61,7 +61,8 @@ class SessionLoginServiceTest {
     @Test
     void loginUserTestWithFail() {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        when(mockHttpSession.getAttribute(SessionKeys.USER_ID)).thenReturn(testUser.getUserId());
 
         assertThrows(AlreadyLoginException.class, () -> {
             sessionLoginService.loginUser(testUser.getUserId());
@@ -74,7 +75,7 @@ class SessionLoginServiceTest {
     @Test
     void logoutUserTestWithSuccess() {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
 
         sessionLoginService.logoutUser();
 
@@ -90,5 +91,18 @@ class SessionLoginServiceTest {
 
         verify(mockHttpSession).invalidate();
         assertNull(mockHttpSession.getAttribute(SessionKeys.USER_ID));
+    }
+
+    @DisplayName("세션에서 userId 키에 해당하는 값을 가져오면 현재 사용자 아이디 가져오기 성공")
+    @Test
+    void getCurrentUserId() {
+
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        when(mockHttpSession.getAttribute(SessionKeys.USER_ID)).thenReturn(testUser.getUserId());
+
+        String currentUserId = sessionLoginService.getCurrentUserId();
+
+        verify(mockHttpSession).getAttribute(SessionKeys.USER_ID);
+        assertEquals("test1", currentUserId);
     }
 }
