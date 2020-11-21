@@ -30,12 +30,6 @@ build/
 ### VS Code ###
 .vscode/
 
-### Database config ###
-db-secret.properties
-
-### AWS S3 config ###
-s3-secret.properties
-
 ### Lombok config ###
 lombok.config
 
