@@ -140,7 +140,7 @@ class PostServiceTest {
         verify(fileService).uploadImages(9, fileInfos);
     }
 
-    @DisplayName("게시물 조회")
+    @DisplayName("현재 존재하는 게시물의 id를 통해 게시물 조회")
     @Test
     void getPostTest() {
 
@@ -154,7 +154,7 @@ class PostServiceTest {
         verify(postMapper).getPost(8);
     }
 
-    @DisplayName("피드 조회 성공")
+    @DisplayName("현재 존재하는 사용자의 id를 통해 피드 조회")
     @Test
     void getPostsByUserTestWithSuccess() {
         Post testPost1 = new Post(8, "test2", "content", Date.valueOf("2020-10-16"));
@@ -173,7 +173,7 @@ class PostServiceTest {
         verify(postMapper).getPostsByUserId("test2");
     }
 
-    @DisplayName("존재하지 않는 사용자의 피드를 요청한 경우, 피드 조회 실패")
+    @DisplayName("존재하지 않는 사용자의 피드를 요청한 경우 NotExistUserIdException을 던지며 피드 조회 실패")
     @Test
     void getPostsByUserTestWithFail() {
 
@@ -187,7 +187,7 @@ class PostServiceTest {
         verify(postMapper, times(0)).getPostsByUserId("test100");
     }
 
-    @DisplayName("자신이 작성한 게시물 수정")
+    @DisplayName("자신이 작성한 게시물인 경우 게시물 수정 성공")
     @Test
     void updatePostTestWithSuccess() {
 
@@ -201,7 +201,7 @@ class PostServiceTest {
         verify(postMapper).updatePost(8, "update content");
     }
 
-    @DisplayName("다른 사용자가 작성한 게시물 수정하려고 하면 실패")
+    @DisplayName("다른 사용자가 작성한 게시물인 경우 AccessException을 던지며 게시물 수정 실패")
     @Test
     void updatePostTestWithFail() {
 
@@ -249,7 +249,7 @@ class PostServiceTest {
         verify(postMapper).deletePost(10);
     }
 
-    @DisplayName("게시물 이미지 파일 삭제가 실패한 경우, 게시물 삭제 실패")
+    @DisplayName("게시물 이미지 파일 삭제가 실패한 경우 FileDeleteException을 던지며 게시물 삭제 실패")
     @Test
     void deletePostTestWithFail() {
 
@@ -267,7 +267,7 @@ class PostServiceTest {
         verify(postMapper, times(0)).deletePost(11);
     }
 
-    @DisplayName("다른 사람이 작성한 게시물 삭제하려고 하면 실패")
+    @DisplayName("다른 사람이 작성한 게시물인 경우 AccessException을 던지며 게시물 삭제 실패")
     @Test
     void deletePostTestWithFail2() {
 
