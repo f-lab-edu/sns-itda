@@ -45,7 +45,7 @@ public class PostController {
             return RESPONSE_NOT_FOUND;
         }
 
-        return new ResponseEntity<>(post, HttpStatus.OK);
+        return ResponseEntity.ok(post);
     }
 
     @GetMapping
@@ -55,7 +55,7 @@ public class PostController {
         try {
             List<Post> posts = postService.getPostsByUser(userId);
 
-            return new ResponseEntity<>(posts, HttpStatus.OK);
+            return ResponseEntity.ok(posts);
         } catch (NotExistUserIdException e) {
             return RESPONSE_NOT_FOUND;
         }

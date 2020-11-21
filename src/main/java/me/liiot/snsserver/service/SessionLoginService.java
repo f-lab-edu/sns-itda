@@ -1,6 +1,7 @@
 package me.liiot.snsserver.service;
 
 import lombok.RequiredArgsConstructor;
+import me.liiot.snsserver.exception.AlreadyLoginException;
 import me.liiot.snsserver.util.SessionKeys;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
@@ -12,13 +13,18 @@ public class SessionLoginService implements LoginService {
     private final HttpSession httpSession;
 
     @Override
-    public void loginUser(String userId) {
+    public void loginUser(String userId) throws AlreadyLoginException {
+
+        if (getCurrentUserId() != null) {
+            throw new AlreadyLoginException();
+        }
 
         httpSession.setAttribute(SessionKeys.USER_ID, userId);
     }
 
     @Override
     public void logoutUser() {
+
         httpSession.invalidate();
     }
 

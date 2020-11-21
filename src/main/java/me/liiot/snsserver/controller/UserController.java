@@ -3,12 +3,9 @@ package me.liiot.snsserver.controller;
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.annotation.CheckLogin;
 import me.liiot.snsserver.annotation.CurrentUser;
-import me.liiot.snsserver.exception.FileDeleteException;
-import me.liiot.snsserver.exception.FileUploadException;
+import me.liiot.snsserver.exception.*;
 import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.service.LoginService;
-import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -66,8 +63,13 @@ public class UserController {
             return RESPONSE_UNAUTHORIZED;
         }
 
-        loginService.loginUser(user.getUserId());
-        return RESPONSE_OK;
+        try {
+            loginService.loginUser(user.getUserId());
+
+            return RESPONSE_OK;
+        } catch (AlreadyLoginException e) {
+            return RESPONSE_BAD_REQUEST;
+        }
     }
 
     @GetMapping("/logout")

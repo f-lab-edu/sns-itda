@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
         boolean isExistUserId = userMapper.isExistUserId(userId);
 
         if (isExistUserId) {
-            throw new NotUniqueUserIdException("중복된 아이디입니다.");
+            throw new NotUniqueUserIdException(String.format("(%s)는 중복된 아이디입니다.", userId));
         }
     }
 
