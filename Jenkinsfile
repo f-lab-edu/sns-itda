@@ -53,7 +53,7 @@ pipeline {
                                     sourceFiles: "target/*.jar",
                                     removePrefix: "target",
                                     remoteDirectory: "sns-itda/deploy",
-                                    execCommand: "~/scripts/deploy.sh"
+                                    execCommand: "sh ~/scripts/deploy.sh"
                                 )
                             ]
                         )
