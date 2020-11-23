@@ -50,10 +50,10 @@ pipeline {
                             verbose: true,
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "",
-                                    removePrefix: "",
-                                    remoteDirectory: "",
-                                    execCommand: "./deploy.sh"
+                                    sourceFiles: "target/*.jar",
+                                    removePrefix: "target",
+                                    remoteDirectory: "/home/ubuntu/sns-itda/deploy",
+                                    execCommand: "~/scripts/deploy.sh"
                                 )
                             ]
                         )
