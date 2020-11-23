@@ -52,7 +52,7 @@ pipeline {
                                 sshTransfer(
                                     sourceFiles: "target/*.jar",
                                     removePrefix: "target",
-                                    remoteDirectory: "/home/ubuntu/sns-itda/deploy",
+                                    remoteDirectory: "sns-itda/deploy",
                                     execCommand: "~/scripts/deploy.sh"
                                 )
                             ]
