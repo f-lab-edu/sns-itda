@@ -2,8 +2,9 @@ package me.liiot.snsserver.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueIdException;
+import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.model.user.*;
+import me.liiot.snsserver.resolver.CurrentUserArgumentResolver;
 import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.PasswordEncryptor;
@@ -24,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Date;
 
@@ -41,6 +43,9 @@ class UserControllerTest {
     MockMvc mockMvc;
 
     MockHttpSession mockHttpSession;
+
+    @MockBean
+    CurrentUserArgumentResolver currentUserArgumentResolver;
 
     @MockBean
     UserService userService;
@@ -123,7 +128,7 @@ class UserControllerTest {
     @Test
     public void checkUserIdDupeTestWithDupe() throws Exception {
 
-        doThrow(NotUniqueIdException.class).when(userService).checkUserIdDupe("test1");
+        doThrow(NotUniqueUserIdException.class).when(userService).checkUserIdDupe("test1");
 
         mockMvc.perform(get("/users/test1/exists"))
                 .andDo(print())
@@ -153,7 +158,7 @@ class UserControllerTest {
     @Test
     public void loginUserTestWithFail() throws Exception {
 
-        UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test2", "5678");
+        UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test2", "wrongPassword");
 
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(null);
 
@@ -181,7 +186,7 @@ class UserControllerTest {
     @Test
     public void updateUserTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
         MockMultipartFile testFile = new MockMultipartFile(
                 "profileImage",
@@ -208,6 +213,8 @@ class UserControllerTest {
             }
         });
 
+        doNothing().when(userService).updateUser(encryptedTestUser, userUpdateParam, testFile);
+
         mockMvc.perform(builder
                         .file(testFile)
                         .session(mockHttpSession)
@@ -216,16 +223,18 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
+        verify(userService).updateUser(any(User.class), any(UserUpdateParam.class), any(MultipartFile.class));
     }
 
     @Test
     public void updateUserPasswordTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
         UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
                 "1234", "5678", "5678");
+
+        doNothing().when(userService).updateUserPassword(encryptedTestUser, passwordUpdateParam);
 
         mockMvc.perform(
                 put("/users/my-account/password")
@@ -235,21 +244,21 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
+        verify(userService).updateUserPassword(any(User.class), any(UserPasswordUpdateParam.class));
         verify(loginService).logoutUser();
     }
 
     @Test
     public void updateUserPasswordTestWithFailAndInvalidValue() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
         UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
                 "5678", "1234", "6789");
 
         doThrow(InvalidValueException.class)
                 .when(userService)
-                .updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
+                .updateUserPassword(any(User.class), any(UserPasswordUpdateParam.class));
 
         mockMvc.perform(
                 put("/users/my-account/password")
@@ -259,14 +268,16 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isConflict());
 
-        verify(userService).updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
+        verify(userService).updateUserPassword(any(User.class), any(UserPasswordUpdateParam.class));
         verify(loginService, times(0)).logoutUser();
     }
 
     @Test
     public void deleteUserTestWithSuccess() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
+
+        doNothing().when(userService).deleteUser(encryptedTestUser, encryptedTestUser.getPassword());
 
         mockMvc.perform(
                 delete("/users/my-account")
@@ -275,25 +286,25 @@ class UserControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk());
 
-        verify(userService).deleteUser(encryptedTestUser, "1234");
+        verify(userService).deleteUser(any(User.class), eq("1234"));
         verify(loginService).logoutUser();
     }
 
     @Test
     public void deleteUserTestWithFailAndInvalidPassword() throws Exception {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
-        doThrow(InvalidValueException.class).when(userService).deleteUser(eq(encryptedTestUser), anyString());
+        doThrow(InvalidValueException.class).when(userService).deleteUser(any(User.class), anyString());
 
         mockMvc.perform(
                 delete("/users/my-account")
                         .session(mockHttpSession)
-                        .param("password","5678"))
+                        .param("password","wrongPassword"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
 
-        verify(userService).deleteUser(encryptedTestUser, "5678");
+        verify(userService).deleteUser(any(User.class), eq("wrongPassword"));
         verify(loginService, times(0)).logoutUser();
     }
 }

@@ -2,7 +2,7 @@ package me.liiot.snsserver.service;
 
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueIdException;
+import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.model.user.*;
@@ -44,11 +44,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void checkUserIdDupe(String userId) throws NotUniqueIdException {
+    public void checkUserIdDupe(String userId) throws NotUniqueUserIdException {
         boolean isExistUserId = userMapper.isExistUserId(userId);
 
         if (isExistUserId) {
-            throw new NotUniqueIdException("중복된 아이디입니다.");
+            throw new NotUniqueUserIdException("중복된 아이디입니다.");
         }
     }
 
