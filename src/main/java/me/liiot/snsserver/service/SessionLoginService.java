@@ -11,14 +11,21 @@ public class SessionLoginService implements LoginService {
 
     private final HttpSession httpSession;
 
+    private final PushService pushService;
+
     @Override
     public void loginUser(String userId) {
 
         httpSession.setAttribute(SessionKeys.USER_ID, userId);
+
+        pushService.setToken(userId);
     }
 
     @Override
     public void logoutUser() {
+
+        pushService.deleteToken(getCurrentUserId());
+
         httpSession.invalidate();
     }
 
