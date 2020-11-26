@@ -1,33 +1,37 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.model.user.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.util.SessionKeys;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 
 @Service
+@RequiredArgsConstructor
 public class SessionLoginService implements LoginService {
 
-    @Autowired
-    HttpSession httpSession;
+    private final HttpSession httpSession;
+
+    private final PushService pushService;
 
     @Override
-    public void loginUser(User user) {
-        ObjectMapper mapper = new ObjectMapper();
+    public void loginUser(String userId) {
 
-        try {
-            String jsonStr = mapper.writeValueAsString(user);
-            httpSession.setAttribute(SessionKeys.USER, jsonStr);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("로그인을 하는 과정에서 에러가 발생하였습니다.", e);
-        }
+        httpSession.setAttribute(SessionKeys.USER_ID, userId);
+
+        pushService.setToken(userId);
     }
 
     @Override
     public void logoutUser() {
+
+        pushService.deleteToken(getCurrentUserId());
+
         httpSession.invalidate();
+    }
+
+    @Override
+    public String getCurrentUserId() {
+
+        return (String) httpSession.getAttribute(SessionKeys.USER_ID);
     }
 }
