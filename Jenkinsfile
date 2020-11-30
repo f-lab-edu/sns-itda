@@ -42,7 +42,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t cyj199637/sns-itda .'
+                sh 'docker build -t cyj199637/sns-itda:${env.BUILD_NUMBER} .'
             }
         }
 
