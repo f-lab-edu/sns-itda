@@ -40,6 +40,18 @@ pipeline {
             }
         }
 
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t cyj199637/sns-itda .'
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push cyj199637/sns-itda'
+            }
+        }
+
         stage('Deploy') {
             steps([$class: 'BapSshPromotionPublisherPlugin']) {
                 sshPublisher(
@@ -50,10 +62,10 @@ pipeline {
                             verbose: true,
                             transfers: [
                                 sshTransfer(
-                                    sourceFiles: "target/*.jar",
-                                    removePrefix: "target",
-                                    remoteDirectory: "sns-itda/deploy",
-                                    execCommand: "sh ~/scripts/deploy.sh"
+                                    sourceFiles: "",
+                                    removePrefix: "",
+                                    remoteDirectory: "",
+                                    execCommand: "sh ~/scripts/deploy-docker.sh"
                                 )
                             ]
                         )
