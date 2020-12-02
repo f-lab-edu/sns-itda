@@ -39,13 +39,37 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy') {
+            steps([$class: 'BapSshPromotionPublisherPlugin']) {
+                sshPublisher(
+                    continueOnError: false, failOnError: true,
+                    publishers: [
+                        sshPublisherDesc(
+                            configName: "server-deploy",
+                            verbose: true,
+                            transfers: [
+                                sshTransfer(
+                                    sourceFiles: "target/*.jar",
+                                    removePrefix: "target",
+                                    remoteDirectory: "sns-itda/deploy",
+                                    execCommand: "sh ~/scripts/deploy.sh"
+                                )
+                            ]
+                        )
+                    ]
+                )
+            }
+        }
     }
 
     post {
         failure {
-            mail to: 'cyj199637@gmail.com',
-            subject: 'Jenkins Pipeline Build Fail',
-            body: 'Somthing Errors'
+            mail to: "cyj199637@gmail.com",
+            subject: "FAILURE: Job '${env.JOB_NAME} [${env.BRANCH_NAME}] [${env.BUILD_NUMBER}]'",
+            body: """
+                  Check console output at "<a href="${env.BUILD_URL}">${env.JOB_NAME} [${env.BRANCH_NAME}] [${env.BUILD_NUMBER}]</a>"
+                  """
         }
     }
 }
