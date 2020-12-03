@@ -4,9 +4,11 @@ import me.liiot.snsserver.annotation.ClientDatabase;
 import me.liiot.snsserver.model.post.Image;
 import me.liiot.snsserver.model.post.ImageUploadInfo;
 import me.liiot.snsserver.util.ClientDatabases;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+@Mapper
 public interface FileMapper {
 
     @ClientDatabase(value = ClientDatabases.MASTER)
