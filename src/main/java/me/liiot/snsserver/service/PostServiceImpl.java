@@ -46,6 +46,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @CacheEvict(cacheNames = CacheNames.FEED, key = "#user.userId")
     public void uploadPost(User user, String content, List<MultipartFile> images) {
+
         PostUploadInfo postUploadInfo = new PostUploadInfo(user.getUserId(), content);
 
         postMapper.insertPost(postUploadInfo);

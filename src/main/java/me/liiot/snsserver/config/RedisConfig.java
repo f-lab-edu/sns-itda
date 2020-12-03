@@ -21,6 +21,7 @@ public class RedisConfig {
 
     @Bean
     RedisConnectionFactory redisConnectionFactory() {
+      
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(hostName);
         redisStandaloneConfiguration.setPort(port);
@@ -30,10 +31,13 @@ public class RedisConfig {
 
     @Bean
     RedisTemplate<String, Object> redisTemplate() {
+      
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        redisTemplate.setDefaultSerializer(new GenericJackson2JsonRedisSerializer());
+
         return redisTemplate;
     }
 }
