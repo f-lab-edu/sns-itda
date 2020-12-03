@@ -26,6 +26,9 @@ class SessionLoginServiceTest {
     @Mock
     private MockHttpSession mockHttpSession;
 
+    @Mock
+    private PushService pushService;
+
     @InjectMocks
     private SessionLoginService sessionLoginService;
 
@@ -50,6 +53,7 @@ class SessionLoginServiceTest {
 
         ArgumentCaptor<String> valueCapture = ArgumentCaptor.forClass(String.class);
         doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER_ID), valueCapture.capture());
+        doNothing().when(pushService).setToken("test1");
 
         sessionLoginService.loginUser(testUser.getUserId());
 
