@@ -4,10 +4,12 @@ import me.liiot.snsserver.annotation.ClientDatabase;
 import me.liiot.snsserver.model.post.Post;
 import me.liiot.snsserver.model.post.PostUploadInfo;
 import me.liiot.snsserver.util.ClientDatabases;
+import org.apache.ibatis.annotations.Mapper;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
+@Mapper
 public interface PostMapper {
 
     @ClientDatabase(ClientDatabases.MASTER)

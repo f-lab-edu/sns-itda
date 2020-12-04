@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="me.liiot.snsserver.mapper.FollowMapper">
+    <insert id="insertFollow">
+        INSERT INTO follow(userId, followUserId)
+        VALUES(#{userId}, #{followUserId})
+    </insert>
+
+    <delete id="deleteFollow">
+        DELETE FROM follow
+        WHERE userId = #{userId}
+        AND followUserId = #{followUserId}
+    </delete>
+</mapper>
