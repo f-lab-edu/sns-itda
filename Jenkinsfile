@@ -42,7 +42,7 @@ pipeline {
 
         stage('Remove Docker Image') {
             steps {
-                sh "docker rmi 'docker images -a -q */sns-itda'"
+                sh "docker rmi $(docker images -a -q *sns-itda*)"
             }
         }
 
