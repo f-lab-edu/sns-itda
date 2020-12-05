@@ -42,7 +42,9 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t cyj199637/sns-itda .'
+                script {
+                    image = docker.build('cyj199637/sns-itda')
+                }
             }
         }
 
@@ -50,7 +52,7 @@ pipeline {
             steps {
                 script{
                     docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub')
-                    Image.push('latest')
+                    image.push('latest')
                 }
             }
         }
