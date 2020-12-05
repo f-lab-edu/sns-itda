@@ -65,7 +65,7 @@ pipeline {
         stage('Remove Docker Image') {
             steps {
                 sh 'docker rmi cyj199637/sns-itda'
-                sh 'registry.hub.docker.com/cyj199637/sns-itda:latest'
+                sh 'docker rmi registry.hub.docker.com/cyj199637/sns-itda:latest'
             }
         }
 
