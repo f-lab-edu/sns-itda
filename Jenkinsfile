@@ -1,5 +1,9 @@
 pipeline {
     agent any
+    environment {
+        image = ''
+    }
+
     tools {
         maven 'M3'
     }
@@ -51,8 +55,9 @@ pipeline {
         stage('Push Docker Image') {
             steps {
                 script{
-                    docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub')
-                    image.push('latest')
+                    docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub') {
+                        image.push('latest')
+                    }
                 }
             }
         }
