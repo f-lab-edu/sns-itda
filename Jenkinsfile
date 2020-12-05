@@ -48,8 +48,10 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub')
-                Image.push('latest')
+                script{
+                    docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub')
+                    Image.push('latest')
+                }
             }
         }
 
