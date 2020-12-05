@@ -40,13 +40,6 @@ pipeline {
             }
         }
 
-        stage('Remove Docker Image') {
-            steps {
-                sh 'docker rmi cyj199637/sns-itda'
-                sh 'registry.hub.docker.com/cyj199637/sns-itda:latest'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t cyj199637/sns-itda .'
@@ -57,6 +50,13 @@ pipeline {
             steps {
                 sh 'docker login'
                 sh 'docker push cyj199637/sns-itda'
+            }
+        }
+
+        stage('Remove Docker Image') {
+            steps {
+                sh 'docker rmi cyj199637/sns-itda'
+                sh 'registry.hub.docker.com/cyj199637/sns-itda:latest'
             }
         }
 
