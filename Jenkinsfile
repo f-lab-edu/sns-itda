@@ -42,13 +42,14 @@ pipeline {
 
         stage('Remove Docker Image') {
             steps {
-                sh 'docker rmi \$(docker images -a -q *sns-itda*)'
+                sh 'docker rmi cyj199637/sns-itda'
+                sh 'registry.hub.docker.com/cyj199637/sns-itda:latest'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t cyj199637/sns-itda'
+                sh 'docker build -t cyj199637/sns-itda .'
             }
         }
 
