@@ -4,6 +4,6 @@ VOLUME /tmp
 
 EXPOSE 8080
 
-ADD target/sns-server-0.0.1-SNAPSHOT.jar sns-server-0.0.1-SNAPSHOT.jar
+COPY target/sns-server-0.0.1-SNAPSHOT.jar sns-itda.jar
 
-ENTRYPOINT ["java", "-jar", "/sns-server-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "/sns-itda.jar"]

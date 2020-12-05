@@ -40,14 +40,21 @@ pipeline {
             }
         }
 
+        stage('Remove Docker Image') {
+            steps {
+                sh "docker rmi 'docker images -a -q */sns-itda'"
+            }
+        }
+
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t cyj199637/sns-itda:${env.BUILD_NUMBER} .'
+                sh 'docker build -t cyj199637/sns-itda'
             }
         }
 
         stage('Push Docker Image') {
             steps {
+                sh 'docker login'
                 sh 'docker push cyj199637/sns-itda'
             }
         }
