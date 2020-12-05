@@ -48,8 +48,8 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker login'
-                sh 'docker push cyj199637/sns-itda'
+                docker.withRegistry('https://registry.hub.docker.com/', 'docker-hub')
+                Image.push('latest')
             }
         }
 
