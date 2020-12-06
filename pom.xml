@@ -161,6 +161,16 @@
         </dependency>
 
         <!--
+        spring-boot-starter-validation
+        : Bean Validation을 사용하기 위한 스타터
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+
+        <!--
         spring-boot-starter-test
         : Spring Boot 애플리케이션을 테스트하기 위한 스타터
           JUnit, Hamcrest, Mockito를 포함

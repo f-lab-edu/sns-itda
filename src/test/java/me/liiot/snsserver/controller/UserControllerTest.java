@@ -25,6 +25,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.sql.Date;
@@ -96,19 +98,18 @@ class UserControllerTest {
     @Test
     public void signUpUserTest() throws Exception {
 
-        UserSignUpParam userSignUpParam = UserSignUpParam.builder()
-                .userId("test1")
-                .password("1234")
-                .name("Sally")
-                .phoneNumber("01012341234")
-                .email("test1@test.com")
-                .birth(Date.valueOf("1990-01-10"))
-                .build();
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("userId", "test1");
+        paramMap.add("password", "1234");
+        paramMap.add("name", "Sally");
+        paramMap.add("phoneNumber", "01012341234");
+        paramMap.add("email", "test1@test.com");
+        paramMap.add("birth", "1990-01-10");
 
         mockMvc.perform(
                 post("/users")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userSignUpParam)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
@@ -140,14 +141,16 @@ class UserControllerTest {
     @Test
     public void loginUserTestWithSuccess() throws Exception {
 
-        UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test1", "1234");
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("userId", "test1");
+        paramMap.add("password", "1234");
 
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(encryptedTestUser);
 
         mockMvc.perform(
                 post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userIdAndPassword)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -158,14 +161,16 @@ class UserControllerTest {
     @Test
     public void loginUserTestWithFail() throws Exception {
 
-        UserIdAndPassword userIdAndPassword = new UserIdAndPassword("test2", "wrongPassword");
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("userId", "test2");
+        paramMap.add("password", "wrongPassword");
 
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(null);
 
         mockMvc.perform(
                 post("/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(userIdAndPassword)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
 
@@ -188,19 +193,18 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("name", "Sarah");
+        paramMap.add("phoneNumber", "01012345678");
+        paramMap.add("email", "test1@abc.com");
+        paramMap.add("birth", "1990-02-20");
+        paramMap.add("profileMessage", "안녕하세요");
+
         MockMultipartFile testFile = new MockMultipartFile(
                 "profileImage",
                 "profileImage",
                 "image/png",
                 "profileImage".getBytes());
-
-        UserUpdateParam userUpdateParam = UserUpdateParam.builder()
-                .name("Sarah")
-                .phoneNumber("01012345678")
-                .email("test1@abc.com")
-                .birth(Date.valueOf("1990-02-20"))
-                .profileMessage("안녕하세요")
-                .build();
 
         // multipart로 request를 보내면 요청 방식이 "POST"로 하드코딩되어 있어 이를 임시로 "PUT"으로 변경
         MockMultipartHttpServletRequestBuilder builder =
@@ -213,13 +217,13 @@ class UserControllerTest {
             }
         });
 
-        doNothing().when(userService).updateUser(encryptedTestUser, userUpdateParam, testFile);
+        doNothing().when(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
 
         mockMvc.perform(builder
                         .file(testFile)
                         .session(mockHttpSession)
                         .contentType(MediaType.MULTIPART_FORM_DATA)
-                        .content(mapper.writeValueAsString(userUpdateParam)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -231,16 +235,18 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
-        UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
-                "1234", "5678", "5678");
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("existPassword", "1234");
+        paramMap.add("newPassword", "5678");
+        paramMap.add("checkNewPassword", "5678");
 
-        doNothing().when(userService).updateUserPassword(encryptedTestUser, passwordUpdateParam);
+        doNothing().when(userService).updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
 
         mockMvc.perform(
                 put("/users/my-account/password")
                         .session(mockHttpSession)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(passwordUpdateParam)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isOk());
 
@@ -253,8 +259,10 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
-        UserPasswordUpdateParam passwordUpdateParam = new UserPasswordUpdateParam(
-                "5678", "1234", "6789");
+        MultiValueMap<String, String> paramMap = new LinkedMultiValueMap<>();
+        paramMap.add("existPassword", "5678");
+        paramMap.add("newPassword", "1234");
+        paramMap.add("checkNewPassword", "6789");
 
         doThrow(InvalidValueException.class)
                 .when(userService)
@@ -264,7 +272,7 @@ class UserControllerTest {
                 put("/users/my-account/password")
                         .session(mockHttpSession)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mapper.writeValueAsString(passwordUpdateParam)))
+                        .params(paramMap))
                 .andDo(print())
                 .andExpect(status().isConflict());
 
