@@ -6,5 +6,7 @@ EXPOSE 8080
 
 COPY target/sns-server-0.0.1-SNAPSHOT.jar sns-itda.jar
 
+ENV SPRING_PROFILES_ACTIVE prod
+
 ENTRYPOINT ["java", "-jar", "/sns-itda.jar",
-            "-Dspring.config.location=/home/ubuntu/sns-itda/deploy/application.properties"]
+            "-Dspring.profiles.active=${SPRING_PROFILES_ACTIVE}"]
