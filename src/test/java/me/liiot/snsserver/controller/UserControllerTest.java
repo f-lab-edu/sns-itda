@@ -1,6 +1,5 @@
 package me.liiot.snsserver.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import me.liiot.snsserver.exception.InvalidValueException;
 import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.model.user.*;
@@ -9,7 +8,6 @@ import me.liiot.snsserver.service.LoginService;
 import me.liiot.snsserver.service.UserService;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import me.liiot.snsserver.util.SessionKeys;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -55,16 +53,9 @@ class UserControllerTest {
     @MockBean
     LoginService loginService;
 
-    static ObjectMapper mapper;
-
     User testUser;
 
     User encryptedTestUser;
-
-    @BeforeAll
-    public static void setUpAll() {
-        mapper = new ObjectMapper();
-    }
 
     @BeforeEach
     public void setUpEach() {
