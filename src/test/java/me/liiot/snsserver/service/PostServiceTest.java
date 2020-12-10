@@ -1,11 +1,13 @@
 package me.liiot.snsserver.service;
 
 import me.liiot.snsserver.mapper.PostMapper;
+import me.liiot.snsserver.exception.FileDeleteException;
+import me.liiot.snsserver.exception.NotExistUserIdException;
+import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.Post;
 import me.liiot.snsserver.model.post.PostUploadInfo;
 import me.liiot.snsserver.model.user.User;
-import me.liiot.snsserver.model.user.UserSignUpParam;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,6 +33,9 @@ class PostServiceTest {
 
     @Mock
     private PostMapper postMapper;
+
+    @Mock
+    private UserMapper userMapper;
 
     @Mock
     private FileService fileService;
@@ -135,7 +140,7 @@ class PostServiceTest {
         verify(fileService).uploadImages(9, fileInfos);
     }
 
-    @DisplayName("게시물 조회")
+    @DisplayName("현재 존재하는 게시물의 id를 통해 게시물 조회")
     @Test
     void getPostTest() {
 
@@ -149,24 +154,40 @@ class PostServiceTest {
         verify(postMapper).getPost(8);
     }
 
-    @DisplayName("피드 조회")
+    @DisplayName("현재 존재하는 사용자의 id를 통해 피드 조회")
     @Test
-    void getPostsByUserTest() {
+    void getPostsByUserTestWithSuccess() {
         Post testPost1 = new Post(8, "test2", "content", Date.valueOf("2020-10-16"));
         Post testPost2 = new Post(9, "test2", "content", Date.valueOf("2020-10-16"));
         List<Post> posts = new ArrayList<>();
         posts.add(testPost1);
         posts.add(testPost2);
 
+        when(userMapper.isExistUserId("test2")).thenReturn(true);
         when(postMapper.getPostsByUserId("test2")).thenReturn(posts);
 
         List<Post> targetPosts = postService.getPostsByUser("test2");
 
         assertEquals(targetPosts, posts);
+        verify(userMapper).isExistUserId("test2");
         verify(postMapper).getPostsByUserId("test2");
     }
 
-    @DisplayName("자신이 작성한 게시물 수정")
+    @DisplayName("존재하지 않는 사용자의 피드를 요청한 경우 NotExistUserIdException을 던지며 피드 조회 실패")
+    @Test
+    void getPostsByUserTestWithFail() {
+
+        when(userMapper.isExistUserId("test100")).thenReturn(false);
+
+        assertThrows(NotExistUserIdException.class, () -> {
+            postService.getPostsByUser("test100");
+        });
+
+        verify(userMapper).isExistUserId("test100");
+        verify(postMapper, times(0)).getPostsByUserId("test100");
+    }
+
+    @DisplayName("자신이 작성한 게시물인 경우 게시물 수정 성공")
     @Test
     void updatePostTestWithSuccess() {
 
@@ -180,7 +201,7 @@ class PostServiceTest {
         verify(postMapper).updatePost(8, "update content");
     }
 
-    @DisplayName("다른 사용자가 작성한 게시물 수정")
+    @DisplayName("다른 사용자가 작성한 게시물인 경우 AccessException을 던지며 게시물 수정 실패")
     @Test
     void updatePostTestWithFail() {
 
@@ -228,9 +249,27 @@ class PostServiceTest {
         verify(postMapper).deletePost(10);
     }
 
-    @DisplayName("다른 사람이 작성한 게시물 삭제")
+    @DisplayName("게시물 이미지 파일 삭제가 실패한 경우 FileDeleteException을 던지며 게시물 삭제 실패")
     @Test
     void deletePostTestWithFail() {
+
+        when(postMapper.isAuthorizedOnPost(testUser.getUserId(), 11)).thenReturn(true);
+        when(fileService.isExistImages(11)).thenReturn(true);
+        doThrow(FileDeleteException.class).when(fileService).deleteImages(11);
+
+        assertThrows(FileDeleteException.class, () -> {
+            postService.deletePost(testUser, 11);
+        });
+
+        verify(postMapper).isAuthorizedOnPost(testUser.getUserId(), 11);
+        verify(fileService).isExistImages(11);
+        verify(fileService).deleteImages(11);
+        verify(postMapper, times(0)).deletePost(11);
+    }
+
+    @DisplayName("다른 사람이 작성한 게시물인 경우 AccessException을 던지며 게시물 삭제 실패")
+    @Test
+    void deletePostTestWithFail2() {
 
         when(postMapper.isAuthorizedOnPost(testUser.getUserId(), 9)).thenReturn(false);
 

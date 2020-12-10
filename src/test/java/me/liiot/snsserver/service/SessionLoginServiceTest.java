@@ -1,7 +1,6 @@
 package me.liiot.snsserver.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import me.liiot.snsserver.exception.AlreadyLoginException;
 import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.util.PasswordEncryptor;
 import me.liiot.snsserver.util.SessionKeys;
@@ -27,6 +26,9 @@ class SessionLoginServiceTest {
     @Mock
     private MockHttpSession mockHttpSession;
 
+    @Mock
+    private PushService pushService;
+
     @InjectMocks
     private SessionLoginService sessionLoginService;
 
@@ -45,31 +47,66 @@ class SessionLoginServiceTest {
                 .build();
     }
 
-    @DisplayName("로그인")
+    @DisplayName("로그인 성공")
     @Test
-    void loginUserTest() throws JsonProcessingException {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String jsonStr = mapper.writeValueAsString(testUser);
+    void loginUserTestWithSuccess() {
 
         ArgumentCaptor<String> valueCapture = ArgumentCaptor.forClass(String.class);
         doNothing().when(mockHttpSession).setAttribute(eq(SessionKeys.USER_ID), valueCapture.capture());
+        doNothing().when(pushService).setToken("test1");
 
         sessionLoginService.loginUser(testUser.getUserId());
 
-        verify(mockHttpSession).setAttribute(SessionKeys.USER_ID, jsonStr);
-        assertEquals(jsonStr, valueCapture.getValue());
+        verify(mockHttpSession).setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        assertEquals(testUser.getUserId(), valueCapture.getValue());
     }
 
-    @DisplayName("로그아웃")
+    @DisplayName("이미 로그인이 되어 있는 경우 AlreadyLoginException을 던지며 로그인 실패")
     @Test
-    void logoutUserTest() {
+    void loginUserTestWithFail() {
 
-        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser);
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        when(mockHttpSession.getAttribute(SessionKeys.USER_ID)).thenReturn(testUser.getUserId());
+
+        assertThrows(AlreadyLoginException.class, () -> {
+            sessionLoginService.loginUser(testUser.getUserId());
+        });
+
+        verify(mockHttpSession).setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+    }
+
+    @DisplayName("로그아웃 성공")
+    @Test
+    void logoutUserTestWithSuccess() {
+
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
 
         sessionLoginService.logoutUser();
 
         verify(mockHttpSession).invalidate();
         assertNull(mockHttpSession.getAttribute(SessionKeys.USER_ID));
+    }
+
+    @DisplayName("로그인이 되어 있지 않은 경우에도 로그아웃 성공")
+    @Test
+    void logoutUserTestWithSuccess2() {
+
+        sessionLoginService.logoutUser();
+
+        verify(mockHttpSession).invalidate();
+        assertNull(mockHttpSession.getAttribute(SessionKeys.USER_ID));
+    }
+
+    @DisplayName("세션에서 userId 키에 해당하는 값을 가져오면 현재 사용자 아이디 가져오기 성공")
+    @Test
+    void getCurrentUserId() {
+
+        mockHttpSession.setAttribute(SessionKeys.USER_ID, testUser.getUserId());
+        when(mockHttpSession.getAttribute(SessionKeys.USER_ID)).thenReturn(testUser.getUserId());
+
+        String currentUserId = sessionLoginService.getCurrentUserId();
+
+        verify(mockHttpSession).getAttribute(SessionKeys.USER_ID);
+        assertEquals("test1", currentUserId);
     }
 }
