@@ -11,6 +11,7 @@ import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /*
@@ -44,6 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public void checkUserIdDupe(String userId) throws NotUniqueIdException {
         boolean isExistUserId = userMapper.isExistUserId(userId);
 
@@ -53,6 +55,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getLoginUser(UserIdAndPassword userIdAndPassword) {
 
         String storedPassword = userMapper.getPassword(userIdAndPassword.getUserId());

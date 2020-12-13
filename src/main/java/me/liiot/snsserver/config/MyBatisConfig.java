@@ -37,7 +37,7 @@ public class MyBatisConfig {
     private ApplicationContext applicationContext;
 
     @Bean
-    public SqlSessionFactory sqlSessionFactory(@Qualifier(value = "routingDataSource") DataSource dataSource) throws Exception {
+    public SqlSessionFactory sqlSessionFactory(@Qualifier(value = "proxyDataSource") DataSource dataSource) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
         sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:/mapper/**/*.xml"));

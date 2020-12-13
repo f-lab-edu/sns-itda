@@ -12,6 +12,7 @@ import org.springframework.expression.AccessException;
 import me.liiot.snsserver.util.CacheNames;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -60,6 +61,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheNames.POST, key = "#postId")
     public Post getPost(int postId) {
 
@@ -69,6 +71,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheNames.FEED, key = "#userId")
     public List<Post> getPostsByUser(String userId) {
 
