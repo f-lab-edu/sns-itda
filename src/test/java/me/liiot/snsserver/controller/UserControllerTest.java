@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequ
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import java.sql.Date;
 
@@ -49,6 +50,9 @@ class UserControllerTest {
     CurrentUserArgumentResolver currentUserArgumentResolver;
 
     @MockBean
+    LocaleChangeInterceptor localeChangeInterceptor;
+
+    @MockBean
     UserService userService;
 
     @MockBean
@@ -66,7 +70,7 @@ class UserControllerTest {
     }
 
     @BeforeEach
-    public void setUpEach() {
+    public void setUpEach() throws Exception {
         testUser = User.builder()
                 .userId("test1")
                 .password("1234")
@@ -92,6 +96,7 @@ class UserControllerTest {
                 .build();
 
         mockHttpSession = new MockHttpSession();
+        when(localeChangeInterceptor.preHandle(any(), any(), any())).thenReturn(true);
     }
 
     @Test
