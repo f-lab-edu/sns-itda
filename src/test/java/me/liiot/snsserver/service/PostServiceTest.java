@@ -1,8 +1,8 @@
 package me.liiot.snsserver.service;
 
-import me.liiot.snsserver.mapper.PostMapper;
 import me.liiot.snsserver.exception.FileDeleteException;
 import me.liiot.snsserver.exception.NotExistUserIdException;
+import me.liiot.snsserver.mapper.PostMapper;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.Post;
@@ -157,6 +157,7 @@ class PostServiceTest {
     @DisplayName("현재 존재하는 사용자의 id를 통해 피드 조회")
     @Test
     void getPostsByUserTestWithSuccess() {
+
         Post testPost1 = new Post(8, "test2", "content", Date.valueOf("2020-10-16"));
         Post testPost2 = new Post(9, "test2", "content", Date.valueOf("2020-10-16"));
         List<Post> posts = new ArrayList<>();
