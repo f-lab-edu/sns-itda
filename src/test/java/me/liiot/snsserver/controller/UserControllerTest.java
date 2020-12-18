@@ -26,7 +26,9 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import javax.servlet.ServletException;
 import java.sql.Date;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,6 +50,9 @@ class UserControllerTest {
     CurrentUserArgumentResolver currentUserArgumentResolver;
 
     @MockBean
+    LocaleChangeInterceptor localeChangeInterceptor;
+
+    @MockBean
     UserService userService;
 
     @MockBean
@@ -58,7 +63,7 @@ class UserControllerTest {
     User encryptedTestUser;
 
     @BeforeEach
-    public void setUpEach() {
+    public void setUpEach() throws ServletException {
         testUser = User.builder()
                 .userId("test1")
                 .password("1234")
@@ -84,6 +89,8 @@ class UserControllerTest {
                 .build();
 
         mockHttpSession = new MockHttpSession();
+
+        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
     }
 
     @Test
