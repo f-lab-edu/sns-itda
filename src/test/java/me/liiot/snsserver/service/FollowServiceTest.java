@@ -1,5 +1,7 @@
 package me.liiot.snsserver.service;
 
+import me.liiot.snsserver.enumeration.AlarmType;
+import me.liiot.snsserver.enumeration.PushType;
 import me.liiot.snsserver.mapper.FollowMapper;
 import me.liiot.snsserver.model.user.User;
 import me.liiot.snsserver.util.PasswordEncryptor;
@@ -10,17 +12,30 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.MessageSource;
 
 import java.sql.Date;
+import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class FollowServiceTest {
 
     @Mock
     private FollowMapper followMapper;
+
+    @Mock
+    private AlarmService alarmService;
+
+    @Mock
+    private PushService pushService;
+
+    @Mock
+    private LocaleService localeService;
+
+    @Mock
+    private MessageSource messageSource;
 
     @InjectMocks
     private FollowService followService;
@@ -43,9 +58,22 @@ class FollowServiceTest {
     @Test
     void addFollowListTest() {
 
+        String pushMessage = "test2님이 회원님을 팔로우하기 시작했습니다.";
+
+        doNothing().when(alarmService).addAlarm("test2", "test1", AlarmType.FOLLOWING);
+        when(localeService.getCurrentUserLocale()).thenReturn(Locale.KOREA);
+        when(messageSource.getMessage(eq("push.message.following"),
+                eq(new String[]{"test2"}),
+                any(Locale.class)))
+            .thenReturn(pushMessage);
+        doNothing().when(pushService).sendPushMessage("test2", "test1", PushType.FOLLOWING, pushMessage);
+
         followService.addFollowList(testUser.getUserId(), "test1");
 
         verify(followMapper).insertFollow("test2", "test1");
+        verify(alarmService).addAlarm("test2", "test1", AlarmType.FOLLOWING);
+        verify(messageSource).getMessage("push.message.following", new String[]{"test2"}, Locale.KOREA);
+        verify(localeService).getCurrentUserLocale();
     }
 
     @DisplayName("언팔로우 / 팔로우 리스트 삭제")
