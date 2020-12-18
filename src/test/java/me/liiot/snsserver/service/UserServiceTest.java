@@ -8,6 +8,7 @@ import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.model.user.*;
 import me.liiot.snsserver.util.PasswordEncryptor;
+import me.liiot.snsserver.util.SessionKeys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
