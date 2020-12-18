@@ -28,6 +28,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import javax.servlet.ServletException;
 import java.sql.Date;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -62,7 +63,7 @@ class UserControllerTest {
     User encryptedTestUser;
 
     @BeforeEach
-    public void setUpEach() {
+    public void setUpEach() throws ServletException {
         testUser = User.builder()
                 .userId("test1")
                 .password("1234")
@@ -88,6 +89,8 @@ class UserControllerTest {
                 .build();
 
         mockHttpSession = new MockHttpSession();
+
+        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
     }
 
     @Test
@@ -100,8 +103,6 @@ class UserControllerTest {
         paramMap.add("phoneNumber", "01012341234");
         paramMap.add("email", "test1@test.com");
         paramMap.add("birth", "1990-01-10");
-
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
 
         mockMvc.perform(
                 post("/users")
@@ -116,8 +117,6 @@ class UserControllerTest {
     @Test
     public void checkUserIdDupeTestWithoutDupe() throws Exception {
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
-
         mockMvc.perform(get("/users/test1/exists"))
                 .andDo(print())
                 .andExpect(status().isOk());
@@ -128,7 +127,6 @@ class UserControllerTest {
     @Test
     public void checkUserIdDupeTestWithDupe() throws Exception {
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doThrow(NotUniqueUserIdException.class).when(userService).checkUserIdDupe("test1");
 
         mockMvc.perform(get("/users/test1/exists"))
@@ -145,7 +143,6 @@ class UserControllerTest {
         paramMap.add("userId", "test1");
         paramMap.add("password", "1234");
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(encryptedTestUser);
 
         mockMvc.perform(
@@ -166,7 +163,6 @@ class UserControllerTest {
         paramMap.add("userId", "test2");
         paramMap.add("password", "wrongPassword");
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         when(userService.getLoginUser(any(UserIdAndPassword.class))).thenReturn(null);
 
         mockMvc.perform(
@@ -182,8 +178,6 @@ class UserControllerTest {
 
     @Test
     public void logoutUserTest() throws Exception {
-
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
 
         mockMvc.perform(get("/users/logout"))
                 .andDo(print())
@@ -221,7 +215,6 @@ class UserControllerTest {
             }
         });
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doNothing().when(userService).updateUser(eq(encryptedTestUser), any(UserUpdateParam.class), eq(testFile));
 
         mockMvc.perform(builder
@@ -245,7 +238,6 @@ class UserControllerTest {
         paramMap.add("newPassword", "5678");
         paramMap.add("checkNewPassword", "5678");
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doNothing().when(userService).updateUserPassword(eq(encryptedTestUser), any(UserPasswordUpdateParam.class));
 
         mockMvc.perform(
@@ -270,7 +262,6 @@ class UserControllerTest {
         paramMap.add("newPassword", "1234");
         paramMap.add("checkNewPassword", "6789");
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doThrow(InvalidValueException.class)
                 .when(userService)
                 .updateUserPassword(any(User.class), any(UserPasswordUpdateParam.class));
@@ -292,7 +283,6 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doNothing().when(userService).deleteUser(encryptedTestUser, encryptedTestUser.getPassword());
 
         mockMvc.perform(
@@ -311,7 +301,6 @@ class UserControllerTest {
 
         mockHttpSession.setAttribute(SessionKeys.USER_ID, encryptedTestUser.getUserId());
 
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
         doThrow(InvalidValueException.class).when(userService).deleteUser(any(User.class), anyString());
 
         mockMvc.perform(
