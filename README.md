@@ -27,7 +27,7 @@ Java, Spring Boot, IntelliJ, Maven, MyBatis, MySQL, Redis, Jenkins, Docker
 - [MySQL Architecture](https://github.com/f-lab-edu/sns-itda/wiki/MySQL-Architecture)
 - [Redis Architecture](https://github.com/f-lab-edu/sns-itda/wiki/Redis-Architecture)
 
-![Architecture](../sns-server-doc/image/103137857-31791600-4710-11eb-9783-8a03dac3242c.png)
+![Architecture](https://user-images.githubusercontent.com/50859560/103137857-31791600-4710-11eb-9783-8a03dac3242c.png)
 
 
 
@@ -35,7 +35,7 @@ Java, Spring Boot, IntelliJ, Maven, MyBatis, MySQL, Redis, Jenkins, Docker
 
 자세한 사항은 👉 [https://github.com/f-lab-edu/sns-itda/wiki/ERD](https://github.com/f-lab-edu/sns-itda/wiki/ERD)
 
-![](../sns-server-doc/image/103099160-b69cf600-4650-11eb-8bf6-505cbff6cf9a.png)
+![](https://user-images.githubusercontent.com/50859560/103099160-b69cf600-4650-11eb-8bf6-505cbff6cf9a.png)
 
 
 
