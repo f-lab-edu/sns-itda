@@ -1,19 +1,20 @@
-# itda
+# Itda
 
-- twitter, instagram 같은 sns 서비스 구현 프로젝트
-- 기능마다 성능과 유지보수성을 고려하여 구현하는 것을 목표로 개발
-
-
-
-### 사용 기술 및 개발 환경
-
-- IntelliJ, Spring Boot, Maven, Java, MySQL, MyBatis, Redis
+- Instagram, Twitter와 같은 SNS 서비스 ‘Itda’를 개발하는 프로젝트
+- 애플리케이션의 UI는 카카오 오븐으로 대체하여 프론트엔드 부분은 생략하고 벡엔드에 초점을 맞춰 백엔드 개발에 주력
+- 단순 기능 구현 뿐 아니라 성능, 코드의 재사용성 및 유지보수성을 고려하여 구현하는 것을 목표로 개발
 
 
 
-### Application UI
+### ✅ 사용 기술 및 개발 환경
 
-자세한 사항은 ☞ [https://github.com/f-lab-edu/sns-itda/wiki/01.-Application-UI](https://github.com/f-lab-edu/sns-itda/wiki/01.-Application-UI)
+Java, Spring Boot, IntelliJ, Maven, MyBatis, MySQL, Redis, Jenkins, Docker
+
+
+
+### ✅ Application UI
+
+자세한 사항은 👉 [https://github.com/f-lab-edu/sns-itda/wiki/Application-UI](https://github.com/f-lab-edu/sns-itda/wiki/Application-UI)
 
 예시)
 
@@ -21,22 +22,48 @@
 
 
 
+### ✅ Architecture
 
-### 주요 기능
+- [MySQL Architecture](https://github.com/f-lab-edu/sns-itda/wiki/MySQL-Architecture)
+- [Redis Architecture](https://github.com/f-lab-edu/sns-itda/wiki/Redis-Architecture)
 
-* 사용자
-
-  1. 회원가입 / 탈퇴
-  2. 로그인 / 로그아웃
-  3. 회원정보 수정
-  4. 게시글 작성 / 수정 / 삭제 / 조회
-  5. 피드 조회
-  6. 팔로우 / 언팔로우
+![Architecture](../sns-server-doc/image/103137857-31791600-4710-11eb-9783-8a03dac3242c.png)
 
 
 
-### 프로젝트 진행 중 발생한 Technical Issue
+### ✅ ERD
 
-자세한 사항은 ☞ [https://github.com/f-lab-edu/sns-itda/wiki/05.-Technical-Issue](https://github.com/f-lab-edu/sns-itda/wiki/05.-Technical-Issue)
+자세한 사항은 👉 [https://github.com/f-lab-edu/sns-itda/wiki/ERD](https://github.com/f-lab-edu/sns-itda/wiki/ERD)
+
+![](../sns-server-doc/image/103099160-b69cf600-4650-11eb-8bf6-505cbff6cf9a.png)
+
+
+
+### ✅ 주요 기능
+
+* [각 기능별 비즈니스 로직](https://github.com/f-lab-edu/sns-itda/wiki/Business-Rule)
+* [각 기능별 Use Case](https://github.com/f-lab-edu/sns-itda/wiki/Use-Case)
+
+▶ 사용자
+
+1. 회원가입 / 탈퇴
+2. 로그인 / 로그아웃
+3. 회원정보 수정
+4. 게시글 작성 / 수정 / 삭제 / 조회
+5. 피드 조회
+6. 팔로우 / 언팔로우
+7. 알림 - 다른 사람이 팔로우한 경우
+
+
+
+### ✅ 프로젝트를 진행하며 고민한 Technical Issue
+
+자세한 사항은 👉 [https://github.com/f-lab-edu/sns-itda/wiki/Technical-Issue](https://github.com/f-lab-edu/sns-itda/wiki/Technical-Issue)
 
 * 분산 처리 환경에서 대용량 트래픽을 견디기 위한 로그인 기능 구현
+* AOP를 적용하여 부가 로직 제거
+* 프로퍼티 파일을 이용한 외부 설정 주입과 운영 환경에 따른 프로퍼티 파일 분리
+* Spring Cache 적용으로 읽기 작업 성능 향상
+* Redis LFU Eviction 정책을 적용하여 효율적인 캐시 띄우기
+* Redis 성능 향상을 위한 Redis 세션 저장소와 캐시 저장소의 분리
+* 부하 분산을 위한 MySQL Replication 구성 및 쿼리 요청 분기
