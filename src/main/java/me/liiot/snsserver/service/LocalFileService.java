@@ -100,7 +100,7 @@ public class LocalFileService implements FileService {
     }
 
     @Override
-    public void deleteDirectory(String userId) {
+    public void deleteDirectory(String userId) throws FileDeleteException {
 
         StringBuilder dirPath = new StringBuilder()
                 .append(baseDir)
@@ -137,7 +137,7 @@ public class LocalFileService implements FileService {
         }
     }
 
-    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
+    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) throws FileUploadException {
         StringBuilder filePath = new StringBuilder()
                 .append(baseDir)
                 .append(File.separator)

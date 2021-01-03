@@ -1,6 +1,8 @@
 package me.liiot.snsserver.service;
 
+import me.liiot.snsserver.exception.NotExistUserIdException;
 import me.liiot.snsserver.mapper.PostMapper;
+import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.FileInfo;
 import me.liiot.snsserver.model.post.*;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,8 @@ public class PostServiceImpl implements PostService {
 
     private final PostMapper postMapper;
 
+    private final UserMapper userMapper;
+
     private final FileService fileService;
 
     @Override
@@ -73,7 +77,11 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     @Cacheable(cacheNames = CacheNames.FEED, key = "#userId")
-    public List<Post> getPostsByUser(String userId) {
+    public List<Post> getPostsByUser(String userId) throws NotExistUserIdException{
+
+        if (!userMapper.isExistUserId(userId)) {
+            throw new NotExistUserIdException();
+        }
 
         List<Post> posts = postMapper.getPostsByUserId(userId);
 
