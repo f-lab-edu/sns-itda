@@ -11,6 +11,7 @@ import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.exception.SdkServiceException;
@@ -80,12 +81,14 @@ public class AwsFileService implements FileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isExistImages(int postId) {
 
         return fileMapper.isExistImages(postId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Image> getImages(int postId) {
 
         return fileMapper.getImages(postId);
@@ -93,6 +96,7 @@ public class AwsFileService implements FileService {
 
     @Override
     public void deleteFile(String filePath) {
+
         if (filePath != null) {
             String key = filePath.substring(baseUrl.length());
 
@@ -104,7 +108,8 @@ public class AwsFileService implements FileService {
     }
 
     @Override
-    public void deleteDirectory(String userId) {
+    public void deleteDirectory(String userId) throws FileDeleteException {
+
         ListObjectsRequest listObjects = ListObjectsRequest
                 .builder()
                 .bucket(bucket)
@@ -122,7 +127,8 @@ public class AwsFileService implements FileService {
     }
 
     @Override
-    public void deleteImages(int postId) {
+    public void deleteImages(int postId) throws FileDeleteException {
+
         List<String> imagePaths = fileMapper.getImagePaths(postId);
 
         List<ObjectIdentifier> toDelete = imagePaths.stream()
@@ -134,7 +140,7 @@ public class AwsFileService implements FileService {
         fileMapper.deleteImages(postId);
     }
 
-    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) {
+    private FileInfo createFileInfo(MultipartFile file, String userId, String newFileName) throws FileUploadException {
         StringBuilder key = new StringBuilder();
         key.append(userId).append("/").append(newFileName);
 
@@ -162,7 +168,7 @@ public class AwsFileService implements FileService {
         }
     }
 
-    private void sendDeleteObjectsRequest(List<ObjectIdentifier> toDelete) {
+    private void sendDeleteObjectsRequest(List<ObjectIdentifier> toDelete) throws FileDeleteException {
 
         try {
             DeleteObjectsRequest request = DeleteObjectsRequest.builder()

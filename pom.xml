@@ -147,7 +147,7 @@
             <artifactId>firebase-admin</artifactId>
             <version>6.8.1</version>
         </dependency>
-  
+
         <!--
         jasypt-spring-boot-starter
         : jasypt를 사용하기 위한 스타터
@@ -158,6 +158,16 @@
             <artifactId>jasypt-spring-boot-starter</artifactId>
             <version>3.0.3</version>
         </dependency>
+
+        <!--
+        spring-boot-starter-validation
+        : Bean Validation을 사용하기 위한 스타터
+        -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
 
         <!--
         spring-boot-starter-test

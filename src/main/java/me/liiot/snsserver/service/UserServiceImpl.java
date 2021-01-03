@@ -2,7 +2,7 @@ package me.liiot.snsserver.service;
 
 import lombok.RequiredArgsConstructor;
 import me.liiot.snsserver.exception.InvalidValueException;
-import me.liiot.snsserver.exception.NotUniqueIdException;
+import me.liiot.snsserver.exception.NotUniqueUserIdException;
 import me.liiot.snsserver.mapper.UserMapper;
 import me.liiot.snsserver.model.*;
 import me.liiot.snsserver.model.user.*;
@@ -11,6 +11,7 @@ import me.liiot.snsserver.util.PasswordEncryptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /*
@@ -44,15 +45,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void checkUserIdDupe(String userId) throws NotUniqueIdException {
+    @Transactional(readOnly = true)
+    public void checkUserIdDupe(String userId) throws NotUniqueUserIdException {
         boolean isExistUserId = userMapper.isExistUserId(userId);
 
         if (isExistUserId) {
-            throw new NotUniqueIdException("중복된 아이디입니다.");
+            throw new NotUniqueUserIdException(String.format("(%s)는 중복된 아이디입니다.", userId));
         }
     }
 
     @Override
+    @Transactional(readOnly = true)
     public User getLoginUser(UserIdAndPassword userIdAndPassword) {
 
         String storedPassword = userMapper.getPassword(userIdAndPassword.getUserId());
