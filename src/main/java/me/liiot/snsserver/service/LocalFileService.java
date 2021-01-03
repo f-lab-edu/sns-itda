@@ -11,6 +11,7 @@ import me.liiot.snsserver.util.FileUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -77,12 +78,14 @@ public class LocalFileService implements FileService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isExistImages(int postId) {
 
         return fileMapper.isExistImages(postId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Image> getImages(int postId) {
 
         return fileMapper.getImages(postId);

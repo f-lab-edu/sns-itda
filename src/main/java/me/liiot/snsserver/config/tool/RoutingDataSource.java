@@ -1,6 +1,8 @@
 package me.liiot.snsserver.config.tool;
 
+import me.liiot.snsserver.util.ClientDatabases;
 import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /*
 AbstractRoutingDataSource
@@ -15,9 +17,8 @@ public class RoutingDataSource extends AbstractRoutingDataSource {
     @Override
     protected Object determineCurrentLookupKey() {
 
-        String name = ClientDatabaseContext.getClientDatabase();
-        ClientDatabaseContext.clear();
+        boolean isReadOnly = TransactionSynchronizationManager.isCurrentTransactionReadOnly();
 
-        return name;
+        return isReadOnly ? ClientDatabases.SLAVE : ClientDatabases.MASTER;
     }
 }
