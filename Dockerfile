@@ -4,4 +4,4 @@ EXPOSE 8080
 
 COPY target/*.jar sns-itda.jar
 
-ENTRYPOINT ["java", "-jar", "/sns-itda.jar", "${JAVA_OPTS}"]
+ENTRYPOINT ["java", "-jar", "/sns-itda.jar", "${_JAVA_OPTIONS}"]
