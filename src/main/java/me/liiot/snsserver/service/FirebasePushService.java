@@ -22,7 +22,7 @@ import java.util.Arrays;
 public class FirebasePushService implements PushService {
 
     @Value("${firebase.account.key.path}")
-    private final String apiKeyPath;
+    private String apiKeyPath;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
