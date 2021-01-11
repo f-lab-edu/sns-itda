@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import me.liiot.snsserver.enumeration.PushType;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class FirebasePushService implements PushService {
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -61,7 +63,7 @@ public class FirebasePushService implements PushService {
             googleCredential.refreshToken();
             return googleCredential.getAccessToken();
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed getting access token: {}", e.getMessage());
         }
         return null;
     }

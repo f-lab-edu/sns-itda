@@ -89,8 +89,8 @@ class UserControllerTest {
                 .build();
 
         mockHttpSession = new MockHttpSession();
-
-        doReturn(true).when(localeChangeInterceptor).preHandle(any(), any(), any());
+      
+        when(localeChangeInterceptor.preHandle(any(), any(), any())).thenReturn(true);
     }
 
     @Test
