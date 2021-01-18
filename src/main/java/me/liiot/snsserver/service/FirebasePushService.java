@@ -67,7 +67,7 @@ public class FirebasePushService implements PushService {
             googleCredential.refreshToken();
             return googleCredential.getAccessToken();
         } catch (IOException e) {
-            log.error("Failed getting access token: {}", e.getMessage());
+            log.error("Failed getting access token: {}", e);
         }
         return null;
     }

@@ -39,7 +39,7 @@ public class FirebaseConfig {
                 FirebaseApp.initializeApp(options);
             }
         } catch (IOException e) {
-            log.error("Failed initializing FilebaseApp: {}, {}", e.getMessage(), apiKeyPath);
+            log.error("Failed initializing FilebaseApp: {}", e);
         }
     }
 }
