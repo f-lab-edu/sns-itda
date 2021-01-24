@@ -7,12 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.liiot.snsserver.enumeration.PushType;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
@@ -64,7 +61,7 @@ public class FirebasePushService implements PushService {
     private String getAccessToken() {
         try {
             GoogleCredential googleCredential = GoogleCredential
-                    .fromStream(new FileInputStream(ResourceUtils.getFile(apiKeyPath)))
+                    .fromStream(new FileInputStream(apiKeyPath))
                     .createScoped(Arrays.asList("https://www.googleapis.com/auth/cloud-platform",
                                                 "https://www.googleapis.com/auth/firebase.messaging"));
             googleCredential.refreshToken();

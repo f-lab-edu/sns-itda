@@ -6,8 +6,6 @@ import com.google.firebase.FirebaseOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.util.ResourceUtils;
 
 import javax.annotation.PostConstruct;
 import java.io.FileInputStream;
@@ -31,7 +29,7 @@ public class FirebaseConfig {
     @PostConstruct
     public void initialize() {
         try {
-            InputStream serviceAccount = new FileInputStream(ResourceUtils.getFile(apiKeyPath));
+            InputStream serviceAccount = new FileInputStream(apiKeyPath);
 
             FirebaseOptions options = new FirebaseOptions.Builder()
                     .setCredentials(GoogleCredentials.fromStream(serviceAccount))
