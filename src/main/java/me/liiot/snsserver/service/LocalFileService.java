@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Profile("dev")
+@Profile("local")
 public class LocalFileService implements FileService {
 
     @Value("${itda.local.file.base.directory}")
