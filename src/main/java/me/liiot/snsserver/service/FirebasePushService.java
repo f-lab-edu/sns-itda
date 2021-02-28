@@ -6,10 +6,11 @@ import com.google.firebase.messaging.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import me.liiot.snsserver.enumeration.PushType;
-import org.springframework.core.io.ClassPathResource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -19,6 +20,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 @Slf4j
 public class FirebasePushService implements PushService {
+
+    @Value("${firebase.account.key.path}")
+    private String apiKeyPath;
 
     private final RedisTemplate<String, Object> redisTemplate;
 
@@ -57,13 +61,13 @@ public class FirebasePushService implements PushService {
     private String getAccessToken() {
         try {
             GoogleCredential googleCredential = GoogleCredential
-                    .fromStream(new ClassPathResource("sns-itda-firebase-adminsdk.json").getInputStream())
+                    .fromStream(new FileInputStream(apiKeyPath))
                     .createScoped(Arrays.asList("https://www.googleapis.com/auth/cloud-platform",
                                                 "https://www.googleapis.com/auth/firebase.messaging"));
             googleCredential.refreshToken();
             return googleCredential.getAccessToken();
         } catch (IOException e) {
-            log.error("Failed getting access token: {}", e.getMessage());
+            log.error("Failed getting access token: ", e);
         }
         return null;
     }
